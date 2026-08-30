@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>雲養龜觀察所｜LIVE OBSERVATION</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F2ECDD;
+    --paper:#FBF7EC;
+    --paper-2:#F7F1E1;
+    --ink:#2E2A20;
+    --ink-soft:#5A5346;
+    --green:#4F6B4A;
+    --green-deep:#2E3F27;
+    --green-pale:#DCE6D2;
+    --wood:#A9804E;
+    --wood-deep:#6E5030;
+    --warn:#B96A32;
+    --warn-pale:#F3DFC7;
+    --line:#DED0AE;
+    --line-soft:#E7DCC0;
+    --shadow: 0 10px 30px -14px rgba(46,42,32,0.28);
+    --radius: 20px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #EFE8D2 0%, transparent 60%),
+      radial-gradient(900px 400px at 100% 0%, #E7E0C9 0%, transparent 55%),
+      var(--cream);
+    color:var(--ink);
+    font-family:'Noto Sans TC', sans-serif;
+    line-height:1.6;
+    padding-bottom:80px;
+  }
+  .mono{font-family:'Space Mono', monospace;}
+  .serif{font-family:'Noto Serif TC', serif;}
+  .wrap{max-width:920px;margin:0 auto;padding:0 20px;}
+
+  /* ---------- top ticker ---------- */
+  .ticker{
+    background:var(--green-deep);
+    color:#EFE9D4;
+    font-family:'Space Mono',monospace;
+    font-size:12px;
+    letter-spacing:.04em;
+    padding:7px 0;
+    overflow:hidden;
+    white-space:nowrap;
+    position:relative;
+  }
+  .ticker-track{
+    display:inline-block;
+    padding-left:100%;
+    animation: ticker 26s linear infinite;
+  }
+  @keyframes ticker{ from{transform:translateX(0);} to{transform:translateX(-100%);} }
+
+  /* ---------- header ---------- */
+  header{padding:44px 0 8px;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;
+    background:var(--green-deep);color:#F1ECDA;
+    padding:5px 12px;border-radius:100px;
+  }
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:#7FE07F;box-shadow:0 0 0 3px rgba(127,224,127,.25);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+  h1.title{
+    font-family:'Noto Serif TC',serif;
+    font-weight:900;
+    font-size:clamp(30px,6vw,46px);
+    margin:14px 0 6px;
+    color:var(--green-deep);
+    letter-spacing:.01em;
+  }
+  .subtitle{font-size:15px;color:var(--ink-soft);margin:0 0 16px;}
+  .status-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--paper);border:1px solid var(--line);
+    padding:7px 14px;border-radius:100px;font-size:13px;color:var(--ink-soft);
+    font-family:'Space Mono',monospace;
+  }
+  .pill b{color:var(--green-deep);font-weight:700;}
+
+  /* ---------- tab bar ---------- */
+  .tabbar-wrap{
+    position:sticky;top:0;z-index:30;
+    background:var(--cream);
+    padding:16px 0 10px;
+    margin-top:8px;
+  }
+  .tabbar-wrap::after{
+    content:'';position:absolute;left:0;right:0;bottom:0;height:14px;
+    background:linear-gradient(180deg, var(--cream), transparent);
+    pointer-events:none;
+  }
+  .tabbar{
+    display:flex;gap:4px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:100px;
+    padding:5px;
+    overflow-x:auto;
+    box-shadow:var(--shadow);
+  }
+  .tabbtn{
+    flex:1 0 auto;
+    border:none;background:transparent;
+    font-family:'Noto Sans TC',sans-serif;font-weight:700;font-size:13.5px;
+    color:var(--ink-soft);
+    padding:11px 14px;border-radius:100px;cursor:pointer;
+    white-space:nowrap;
+    transition:background .2s ease, color .2s ease;
+  }
+  .tabbtn .n{font-family:'Space Mono',monospace;font-size:11px;margin-right:5px;opacity:.7;}
+  .tabbtn.active{background:var(--green-deep);color:#F2ECDA;}
+  .tabbtn.active .n{opacity:.85;}
+  .tabbtn:not(.active):hover{background:var(--paper-2);color:var(--green-deep);}
+  .tabbtn:focus-visible{outline:3px solid var(--wood);outline-offset:2px;}
+
+  .tabpanel{display:none;animation: fadein .35s ease;}
+  .tabpanel.active{display:block;}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ---------- section label ---------- */
+  .section-label{
+    display:flex;align-items:baseline;gap:10px;margin:44px 0 18px;
+  }
+  .section-label:first-child{margin-top:22px;}
+  .section-label .num{font-family:'Space Mono',monospace;color:var(--wood);font-size:13px;}
+  .section-label h2{font-family:'Noto Serif TC',serif;font-size:21px;margin:0;color:var(--green-deep);}
+  .section-label .rule{flex:1;height:1px;background:var(--line);}
+
+  /* ---------- card base ---------- */
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line-soft);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+
+  /* ---------- hero scene ---------- */
+  .scene-card{
+    padding:0;overflow:hidden;position:relative;
+    background:linear-gradient(180deg,#F7F1DE 0%, #EFE6C9 100%);
+  }
+  .scene-top{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px dashed var(--line);}
+  .scene-top .label{font-family:'Space Mono',monospace;font-size:12px;color:var(--ink-soft);}
+  .scene-top .lock{
+    font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+    color:var(--warn); background:var(--warn-pale); padding:4px 10px;border-radius:8px;
+  }
+  .stage-wrap{padding:10px 22px 28px;display:flex;justify-content:center;}
+  svg#turtleScene{width:100%;max-width:520px;height:auto;}
+  .behavior-line{
+    text-align:center;padding:0 22px 22px;
+    font-family:'Space Mono',monospace;font-size:14px;color:var(--green-deep);font-weight:700;
+  }
+  .behavior-line span.tag{
+    display:inline-block;background:var(--green-pale);color:var(--green-deep);
+    padding:6px 14px;border-radius:100px;
+  }
+
+  #doorHandle{transform-origin: 300px 190px; animation: jiggle 3.4s ease-in-out infinite;}
+  @keyframes jiggle{
+    0%,100%{transform:rotate(0deg);}
+    46%{transform:rotate(0deg);}
+    50%{transform:rotate(-6deg);}
+    54%{transform:rotate(3deg);}
+    58%{transform:rotate(0deg);}
+  }
+  #turtleBody{animation: breathe 3.6s ease-in-out infinite;transform-origin:center;}
+  @keyframes breathe{0%,100%{transform:translateY(0);}50%{transform:translateY(-2px);}}
+  .shake #turtleBody{animation: retreat .6s ease;}
+  @keyframes retreat{
+    0%{transform:translateX(0);}
+    30%{transform:translateX(-14px) rotate(-2deg);}
+    60%{transform:translateX(-6px);}
+    100%{transform:translateX(0);}
+  }
+  .advance #turtleBody{animation: creep .9s ease;}
+  @keyframes creep{
+    0%{transform:translateX(0);}
+    50%{transform:translateX(10px);}
+    100%{transform:translateX(0);}
+  }
+
+  /* ---------- progress card ---------- */
+  .progress-card{padding:26px 26px 24px;}
+  .progress-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:8px;}
+  .progress-head h3{font-family:'Noto Serif TC',serif;font-size:19px;margin:0;color:var(--green-deep);}
+  .progress-num{font-family:'Space Mono',monospace;font-size:44px;font-weight:700;color:var(--green);}
+  .bar-outer{height:22px;background:var(--paper-2);border:1px solid var(--line);border-radius:100px;overflow:hidden;margin:16px 0 10px;}
+  .bar-inner{
+    height:100%;background:linear-gradient(90deg,#7C9A6E,var(--green));
+    border-radius:100px;transition:width .8s cubic-bezier(.4,0,.2,1);
+    display:flex;align-items:center;justify-content:flex-end;
+  }
+  .disclaimer{font-size:12.5px;color:var(--ink-soft);font-style:italic;margin:6px 0 18px;}
+  .mini-hints{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .mini-hint{background:var(--paper-2);border:1px solid var(--line-soft);border-radius:12px;padding:12px 14px;}
+  .mini-hint .k{font-size:11.5px;color:var(--ink-soft);font-family:'Space Mono',monospace;}
+  .mini-hint .v{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--green-deep);margin-top:2px;}
+
+  /* ---------- stage tracker ---------- */
+  .stage-track{
+    display:flex;overflow-x:auto;gap:0;padding:6px 2px 14px;
+    scrollbar-width:thin;
+  }
+  .stage-item{
+    flex:0 0 auto;width:112px;padding:14px 10px;text-align:center;
+    border-right:1px dashed var(--line);position:relative;
+  }
+  .stage-item:last-child{border-right:none;}
+  .stage-item .idx{font-family:'Space Mono',monospace;font-size:11px;color:var(--wood);}
+  .stage-item .nm{font-size:13px;margin-top:6px;color:var(--ink-soft);}
+  .stage-item.current{
+    background:var(--green-pale);border-radius:14px;
+  }
+  .stage-item.current .nm{color:var(--green-deep);font-weight:700;}
+  .stage-item.done .idx{color:var(--green);}
+  .stage-detail{
+    margin-top:14px;padding:16px 18px;background:var(--paper-2);border:1px solid var(--line-soft);border-radius:14px;
+  }
+  .stage-detail .head{font-family:'Space Mono',monospace;font-size:11px;color:var(--wood);letter-spacing:.08em;}
+  .stage-detail .cur{font-family:'Noto Serif TC',serif;font-size:20px;color:var(--green-deep);margin:4px 0 6px;font-weight:700;}
+  .stage-detail p{margin:0;color:var(--ink-soft);font-size:14px;}
+
+  /* ---------- stats grid ---------- */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .stat-card{padding:16px 14px;text-align:center;}
+  .stat-card .ic{font-size:22px;}
+  .stat-card .lb{font-size:12px;color:var(--ink-soft);margin:6px 0 4px;}
+  .stat-card .val{font-family:'Space Mono',monospace;font-weight:700;font-size:17px;color:var(--green-deep);}
+
+  /* ---------- log form ---------- */
+  .log-form{display:flex;flex-direction:column;gap:10px;}
+  .log-label{font-size:11.5px;color:var(--ink-soft);letter-spacing:.04em;}
+  .log-textarea, .log-number{
+    font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--ink);
+    background:var(--paper-2);border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;resize:vertical;width:100%;
+  }
+  .log-textarea:focus, .log-number:focus{outline:2px solid var(--wood);outline-offset:1px;}
+  .log-form-row{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;}
+  .log-field{display:flex;flex-direction:column;gap:6px;}
+  .log-number{width:120px;}
+  .log-status{font-size:12px;color:var(--ink-soft);margin:2px 0 0;}
+
+  /* ---------- timeline ---------- */
+  .timeline{position:relative;padding-left:22px;}
+  .timeline::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line);}
+  .tl-entry{position:relative;padding:0 0 26px 18px;}
+  .tl-entry::before{
+    content:'';position:absolute;left:-22px;top:4px;width:11px;height:11px;border-radius:50%;
+    background:var(--paper);border:3px solid var(--green);
+  }
+  .tl-entry:last-child{padding-bottom:0;}
+  .tl-time{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--wood);}
+  .tl-body{background:var(--paper);border:1px solid var(--line-soft);border-radius:14px;padding:14px 16px;margin-top:6px;box-shadow:var(--shadow);}
+  .tl-body p{margin:0 0 8px;font-size:14.5px;}
+  .tl-progress{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--green-deep);font-weight:700;}
+
+  /* ---------- behavior stats ---------- */
+  .behavior-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .beh-card{padding:16px;text-align:center;}
+  .beh-card .ic{font-size:24px;}
+  .beh-card .lb{font-size:12.5px;color:var(--ink-soft);margin:6px 0 2px;}
+  .beh-card .n{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--green-deep);}
+  .beh-card.zero{background:var(--warn-pale);border-color:#E7C79B;}
+  .beh-card.zero .n{color:var(--warn);font-size:26px;}
+
+  /* ---------- handle wear ---------- */
+  .wear-card{padding:22px 24px;}
+  .wear-card.compact{padding:18px 20px;}
+  .wear-head{display:flex;justify-content:space-between;align-items:center;}
+  .wear-head h3{font-family:'Noto Serif TC',serif;font-size:18px;margin:0;color:var(--green-deep);}
+  .wear-num{font-family:'Space Mono',monospace;font-weight:700;color:var(--wood-deep);}
+  .wear-bar-outer{height:14px;background:var(--paper-2);border:1px solid var(--line);border-radius:100px;margin:12px 0 10px;overflow:hidden;}
+  .wear-bar-inner{height:100%;background:linear-gradient(90deg,#C9A468,var(--wood-deep));border-radius:100px;transition:width .8s ease;}
+  .wear-quotes p{margin:2px 0;font-size:13.5px;color:var(--ink-soft);}
+
+  /* ---------- quote card ---------- */
+  .quote-card{
+    padding:30px 28px;text-align:center;
+    background:linear-gradient(180deg,var(--green-deep),#243620);
+    color:#F3EEDD;
+  }
+  .quote-card .q-label{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.1em;color:#B9C9AE;}
+  .quote-card blockquote{
+    font-family:'Noto Serif TC',serif;font-size:clamp(19px,3vw,24px);font-weight:700;
+    margin:14px 0 8px;line-height:1.55;
+  }
+  .quote-card .q-meta{font-family:'Space Mono',monospace;font-size:12.5px;color:#B9C9AE;}
+
+  /* ---------- MIX ---------- */
+  .mix-card{padding:22px 24px;}
+  .mix-entry{background:var(--paper-2);border:1px solid var(--line-soft);border-radius:14px;padding:16px 18px;}
+  .mix-entry .t{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--wood);}
+  .mix-entry .row{margin-top:10px;font-size:14px;}
+  .mix-entry .row b{color:var(--green-deep);}
+  .mix-warn{
+    margin-top:16px;display:flex;gap:10px;align-items:flex-start;
+    background:var(--warn-pale);border:1px solid #E7C79B;border-radius:12px;padding:12px 14px;
+    font-size:13.5px;color:var(--wood-deep);
+  }
+
+  /* ---------- warning tab ---------- */
+  #warnBanner{
+    display:flex;align-items:center;gap:12px;
+    padding:22px 22px;border-radius:18px;
+    background:var(--warn-pale);border:1px solid #E7C79B;color:var(--wood-deep);
+    font-family:'Space Mono',monospace;font-size:16px;font-weight:700;
+    transition:opacity .4s ease;
+  }
+  #warnBanner .ic{font-size:26px;}
+  .warn-log{margin-top:16px;}
+  .warn-log-item{
+    display:flex;justify-content:space-between;gap:12px;
+    padding:12px 16px;border-bottom:1px dashed var(--line-soft);
+    font-size:13.5px;color:var(--ink-soft);
+  }
+  .warn-log-item:last-child{border-bottom:none;}
+  .warn-log-item .tm{font-family:'Space Mono',monospace;color:var(--wood);white-space:nowrap;}
+  .warn-refresh{
+    margin-top:16px;width:100%;
+    font-family:'Noto Sans TC',sans-serif;font-weight:700;font-size:13.5px;
+    padding:12px;border-radius:100px;border:1px solid var(--line);
+    background:var(--paper);color:var(--green-deep);cursor:pointer;
+  }
+  .warn-refresh:hover{background:var(--paper-2);}
+
+  /* ---------- controls ---------- */
+  .controls{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:36px;}
+  button.act{
+    font-family:'Noto Sans TC',sans-serif;font-weight:700;font-size:15px;
+    padding:14px 26px;border-radius:100px;border:none;cursor:pointer;
+    box-shadow:var(--shadow);transition:transform .15s ease;
+  }
+  button.act:active{transform:scale(.96);}
+  button.act:focus-visible{outline:3px solid var(--wood);outline-offset:2px;}
+  .btn-primary{background:var(--green-deep);color:#F2ECDA;}
+  .btn-secondary{background:var(--paper);color:var(--green-deep);border:1px solid var(--line);}
+  #toast{
+    max-width:420px;margin:16px auto 0;text-align:center;
+    font-family:'Space Mono',monospace;font-size:13.5px;color:var(--green-deep);
+    min-height:20px;opacity:0;transition:opacity .3s ease;
+  }
+  #toast.show{opacity:1;}
+
+  footer{margin-top:60px;text-align:center;}
+  .final-slogan{font-family:'Noto Serif TC',serif;font-weight:900;color:var(--green-deep);}
+  .final-slogan div{font-size:clamp(20px,4vw,28px);margin:5px 0;}
+  .final-slogan .locked{color:var(--wood-deep);}
+
+  @media (max-width:640px){
+    .stats-grid{grid-template-columns:repeat(2,1fr);}
+    .behavior-grid{grid-template-columns:repeat(2,1fr);}
+    .mini-hints{grid-template-columns:1fr;}
+    .tabbtn{font-size:12.5px;padding:10px 12px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker"><div class="ticker-track mono" id="tickerTrack">⚠ 龜龜正在思考　　⚠ 門沒有上鎖　　⚠ 龜龜仍未推門　　⚠ 門把磨損程度正在上升　　⚠ 請勿催促龜龜　　⚠ 何用作福問神仙　　⚠ 龜龜正在思考　　⚠ 門沒有上鎖　　⚠ 龜龜仍未推門　　⚠ 門把磨損程度正在上升　　⚠ 請勿催促龜龜　　⚠ 何用作福問神仙　　</div></div>
+
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow"><span class="dot"></span>LIVE OBSERVATION</span>
+    <h1 class="title">🐢 雲養龜觀察所</h1>
+    <p class="subtitle">持續觀察一隻正在考慮推門的龜。</p>
+    <div class="status-row">
+      <span class="pill">觀察狀態：<b>🟢 持續觀察中</b></span>
+      <span class="pill">觀察日：<b id="dayCount">計算中…</b></span>
+      <span class="pill">今日推門次數：<b>0</b></span>
+    </div>
+  </header>
+
+  <div class="tabbar-wrap">
+    <div class="tabbar" role="tablist" aria-label="觀察所分頁">
+      <button class="tabbtn active" data-tab="home" role="tab" aria-selected="true"><span class="n mono">HOME</span>首頁</button>
+      <button class="tabbtn" data-tab="progress" role="tab" aria-selected="false"><span class="n mono">01</span>階段與進度</button>
+      <button class="tabbtn" data-tab="log" role="tab" aria-selected="false"><span class="n mono">02</span>觀察紀錄</button>
+      <button class="tabbtn" data-tab="warn" role="tab" aria-selected="false"><span class="n mono">03</span>系統警告</button>
+    </div>
+  </div>
+
+  <!-- ======================= TAB: 首頁 ======================= -->
+  <section class="tabpanel active" id="tab-home">
+
+    <!-- 龜龜目前在哪裡 -->
+    <div class="card scene-card" id="sceneCard">
+      <div class="scene-top">
+        <span class="label mono">SECTOR 01 · 門前觀測區</span>
+        <span class="lock">🔓 門鎖狀態：未上鎖</span>
+      </div>
+      <div class="stage-wrap">
+        <svg id="turtleScene" viewBox="0 0 460 260" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="205" width="460" height="55" fill="#E7DCB9"/>
+          <rect x="0" y="205" width="460" height="4" fill="#D7C89A"/>
+          <rect x="0" y="0" width="460" height="205" fill="#F3ECD6"/>
+          <rect x="272" y="45" width="120" height="165" fill="#8A6B44" rx="4"/>
+          <rect x="282" y="55" width="100" height="150" fill="#C79A5F" rx="3"/>
+          <rect x="292" y="65" width="80" height="60" fill="#B6874F" rx="2" opacity="0.5"/>
+          <rect x="292" y="135" width="80" height="60" fill="#B6874F" rx="2" opacity="0.5"/>
+          <g id="doorHandle">
+            <circle cx="300" cy="132" r="7" fill="#5A4530"/>
+            <rect x="298" y="132" width="26" height="5" rx="2.5" fill="#5A4530"/>
+          </g>
+          <g id="turtleBody">
+            <ellipse cx="140" cy="204" rx="72" ry="9" fill="#00000014"/>
+            <image href="assets/turtle.png" x="45" y="62" width="190" height="153" preserveAspectRatio="xMidYMid meet"/>
+          </g>
+        </svg>
+      </div>
+      <div class="behavior-line">
+        <span class="tag mono" id="behaviorTag">🐢 目前行為：研究門把</span>
+      </div>
+    </div>
+
+    <!-- 今日觀察 Dashboard -->
+    <div class="section-label"><span class="num mono">HOME · 01</span><h2>今日觀察 Dashboard</h2><div class="rule"></div></div>
+    <div class="stats-grid" id="statsGrid">
+      <div class="card stat-card"><div class="ic">🐢</div><div class="lb">龜龜位置</div><div class="val">門前</div></div>
+      <div class="card stat-card"><div class="ic">🚪</div><div class="lb">門</div><div class="val">未上鎖</div></div>
+      <div class="card stat-card"><div class="ic">🖐️</div><div class="lb">門把</div><div class="val">已觸摸</div></div>
+      <div class="card stat-card"><div class="ic">🧠</div><div class="lb">心理放行</div><div class="val" id="statMind">73%</div></div>
+      <div class="card stat-card"><div class="ic">📨</div><div class="lb">訊息準備度</div><div class="val">68%</div></div>
+      <div class="card stat-card"><div class="ic">🏃</div><div class="lb">實際行動度</div><div class="val">54%</div></div>
+      <div class="card stat-card"><div class="ic">🐚</div><div class="lb">今日退殼次數</div><div class="val">3</div></div>
+      <div class="card stat-card"><div class="ic">🔁</div><div class="lb">今日研究門把</div><div class="val" id="statTouch">17 次</div></div>
+    </div>
+    <p class="disclaimer" style="text-align:center;">＊以上數字為人工輸入／模擬觀察資料，非真實測量結果。</p>
+
+    <!-- 門把健康狀況（首頁摘要版） -->
+    <div class="section-label"><span class="num mono">HOME · 02</span><h2>🖐️ 門把健康狀況</h2><div class="rule"></div></div>
+    <div class="card wear-card compact">
+      <div class="wear-head">
+        <h3>磨損程度</h3>
+        <span class="wear-num mono">81%</span>
+      </div>
+      <div class="wear-bar-outer"><div class="wear-bar-inner" style="width:81%;"></div></div>
+      <div class="wear-quotes"><p>「龜龜每天摸，門把已經開始懷疑人生。」</p></div>
+    </div>
+
+    <!-- 龜龜今日語錄 -->
+    <div class="section-label"><span class="num mono">HOME · 03</span><h2>💬 龜龜今日語錄</h2><div class="rule"></div></div>
+    <div class="card quote-card">
+      <div class="q-label mono">DAILY QUOTE</div>
+      <blockquote id="quoteText">「我不是不推。」<br>「我只是還在研究。」</blockquote>
+      <div class="q-meta" id="quoteMeta">— 龜龜，今日第 17 次摸門把後</div>
+    </div>
+
+    <div class="controls">
+      <button class="act btn-primary" id="checkBtn">🔍 查看龜龜最新狀態</button>
+      <button class="act btn-secondary" id="pushBtn">🐢 催一下龜龜</button>
+    </div>
+    <div id="toast" class="mono"></div>
+
+  </section>
+
+  <!-- ======================= TAB1: 階段與進度 ======================= -->
+  <section class="tabpanel" id="tab-progress">
+
+    <div class="section-label" style="margin-top:22px;"><span class="num mono">01 · A</span><h2>🐢 龜龜目前階段</h2><div class="rule"></div></div>
+    <div class="card" style="padding:18px 10px 22px;">
+      <div class="stage-track" id="stageTrack"></div>
+      <div class="wrap" style="padding:0 16px;">
+        <div class="stage-detail">
+          <div class="head mono">CURRENT STAGE</div>
+          <div class="cur" id="stageCur">⑤ 研究開門角度</div>
+          <p id="stageDesc">龜龜目前已經知道門怎麼開，但正在研究推門需要幾度。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="num mono">01 · B</span><h2>🚪 推門進度</h2><div class="rule"></div></div>
+    <div class="card progress-card">
+      <div class="progress-head">
+        <h3>心理／行動進程位置</h3>
+        <span class="progress-num mono" id="progressNum">73%</span>
+      </div>
+      <div class="bar-outer"><div class="bar-inner" id="progressBar" style="width:73%;"></div></div>
+      <p class="disclaimer">＊此百分比代表「心理／行動進程位置」，不是實際成功機率。</p>
+      <div class="mini-hints">
+        <div class="mini-hint"><div class="k mono">距離真正推門</div><div class="v">未知</div></div>
+        <div class="mini-hint"><div class="k mono">距離下一次摸門把</div><div class="v">非常近</div></div>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="num mono">01 · C</span><h2>🐢 龜龜今日行為統計</h2><div class="rule"></div></div>
+    <div class="behavior-grid">
+      <div class="card beh-card"><div class="ic">👀</div><div class="lb">偷看門</div><div class="n">23 次</div></div>
+      <div class="card beh-card"><div class="ic">🚶</div><div class="lb">靠近門</div><div class="n">11 次</div></div>
+      <div class="card beh-card"><div class="ic">🖐️</div><div class="lb">摸門把</div><div class="n" id="behTouch">17 次</div></div>
+      <div class="card beh-card"><div class="ic">🧠</div><div class="lb">研究開門方式</div><div class="n">8 次</div></div>
+      <div class="card beh-card"><div class="ic">↩️</div><div class="lb">突然退回去</div><div class="n">4 次</div></div>
+      <div class="card beh-card"><div class="ic">🐚</div><div class="lb">縮進殼裡</div><div class="n">3 次</div></div>
+      <div class="card beh-card"><div class="ic">📨</div><div class="lb">準備傳訊息</div><div class="n">2 次</div></div>
+      <div class="card beh-card zero"><div class="ic">🚪</div><div class="lb">真正推門</div><div class="n">0 次</div></div>
+      <div class="card beh-card zero"><div class="ic">🎉</div><div class="lb">成功開門</div><div class="n">0 次</div></div>
+    </div>
+
+    <div class="section-label"><span class="num mono">01 · D</span><h2>🖐️ 門把健康狀況</h2><div class="rule"></div></div>
+    <div class="card wear-card">
+      <div class="wear-head">
+        <h3>磨損程度</h3>
+        <span class="wear-num mono">81%</span>
+      </div>
+      <div class="wear-bar-outer"><div class="wear-bar-inner" style="width:81%;"></div></div>
+      <div class="wear-quotes">
+        <p>「龜龜每天摸。」</p>
+        <p>「門把已經開始懷疑人生。」</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ======================= TAB2: 觀察紀錄 ======================= -->
+  <section class="tabpanel" id="tab-log">
+
+    <div class="section-label" style="margin-top:22px;"><span class="num mono">02 · A</span><h2>📝 新增真實觀察紀錄</h2><div class="rule"></div></div>
+    <div class="card" style="padding:22px 24px;">
+      <div class="log-form">
+        <label class="log-label mono">今天觀察到什麼？</label>
+        <textarea id="logInput" class="log-textarea" rows="2" placeholder="例如：龜龜今天摸了門把兩次，但沒有靠近推門。"></textarea>
+        <div class="log-form-row">
+          <div class="log-field">
+            <label class="log-label mono">目前進度（可留空）</label>
+            <input id="logProgress" class="log-number" type="number" min="0" max="99" placeholder="例如 74" />
+          </div>
+          <button class="act btn-primary" id="addLogBtn" style="padding:12px 24px;">＋ 新增紀錄</button>
+        </div>
+        <p class="log-status mono" id="logStatus">正在連接雲端儲存…</p>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="num mono">02 · B</span><h2>📋 龜龜觀察紀錄</h2><div class="rule"></div></div>
+    <div class="card" style="padding:24px 24px 4px;">
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <div class="section-label"><span class="num mono">02 · B</span><h2>🔮 MIX 龜龜觀測站</h2><div class="rule"></div></div>
+    <div class="card mix-card">
+      <div class="mix-entry">
+        <div class="t mono">8/29 21:10</div>
+        <div class="row"><b>心理放行進度：</b>70～80%</div>
+        <div class="row"><b>關鍵訊號：</b>「已經知道門在哪裡，但仍在最後防備。」</div>
+        <div class="row"><b>龜龜狀態：</b>摸門把中。</div>
+      </div>
+      <div class="mix-warn">⚠️ <span><b>MIX 系統提醒：</b>請勿每三小時詢問一次同一隻龜。</span></div>
+    </div>
+
+  </section>
+
+  <!-- ======================= TAB3: 系統警告 ======================= -->
+  <section class="tabpanel" id="tab-warn">
+
+    <div class="section-label" style="margin-top:22px;"><span class="num mono">03 · A</span><h2>⚠️ 系統警告</h2><div class="rule"></div></div>
+    <div class="card" style="padding:24px;">
+      <div id="warnBanner"><span class="ic">⚠️</span><span id="warnText">龜龜正在思考。</span></div>
+      <button class="warn-refresh" id="warnRefreshBtn">重新讀取警告訊號</button>
+
+      <div class="warn-log" id="warnLog"></div>
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+  // ---------- data ----------
+  const stages = [
+    "想到門","靠近門","找到門把","摸門把","研究開門角度",
+    "決定要不要推","手放上去","推開一點","門縫出現","發出小小訊息"
+  ];
+  const stageDescs = [
+    "龜龜意識到門的存在，開始進行初步心理建設。",
+    "龜龜已完成移動，正處於門前一公尺的安全觀察距離。",
+    "龜龜的視線已鎖定門把位置，但尚未發起接觸。",
+    "龜龜已完成門把接觸，正在確認其物理特性。",
+    "龜龜目前已經知道門怎麼開，但正在研究推門需要幾度。",
+    "偵測到高強度內部決策活動，結果尚未產出。",
+    "手部（前肢）已就定位，等待最終授權。",
+    "本日觀察到顯著的『原地進展』，門縫寬度趨近於零但不為零。",
+    "門縫已可見，龜龜正在評估是否應該讓訊息通過。",
+    "推門動作接近完成，系統準備記錄本次觀察週期結束。"
+  ];
+  const behaviorTags = [
+    "🐢 目前行為：研究門把","🐢 目前行為：偷看門縫","🐢 目前行為：假裝要走開",
+    "🐢 目前行為：原地踏步","🐢 目前行為：深呼吸中","🐢 目前行為：重新評估角度",
+    "🐢 目前行為：縮回殼裡休息","🐢 目前行為：再次靠近門"
+  ];
+  const quotes = [
+    ["「我不是不推。」","「我只是還在研究。」"],
+    ["「我今天有進步。」","「昨天也有人說我有進步。」"],
+    ["「再研究一下。」",""],
+    ["「我已經走到門前了。」",""],
+    ["「門是不是可以再觀察一下？」",""],
+    ["「我只是確認門把。」",""],
+    ["「我明天一定……」",""],
+    ["「何用作福問神仙。」",""]
+  ];
+  const warnings = [
+    "龜龜正在思考。","龜龜仍未推門。","門把磨損程度正在上升。",
+    "龜龜可能正在研究另一種開門角度。","請勿催促龜龜。",
+    "龜龜已經「快好了」三個小時。","目前沒有任何新的實際行動。",
+    "何用作福問神仙。"
+  ];
+
+  let progress = 73;
+  let touchCount = 17;
+  let wear = 81;
+  const sceneCard = document.getElementById('sceneCard');
+  const warnLogEntries = [];
+
+  // ---------- 觀察日：從 8/13 開始計算 ----------
+  function updateDayCount(){
+    const now = new Date();
+    let start = new Date(now.getFullYear(), 7, 13); // 8月是月份索引 7
+    if(start > now){ start = new Date(now.getFullYear()-1, 7, 13); }
+    const diffDays = Math.floor((now - start) / 86400000) + 1;
+    document.getElementById('dayCount').textContent = `第 ${diffDays} 日`;
+  }
+  updateDayCount();
+
+  // ---------- 真實觀察紀錄（串接 Supabase 資料庫） ----------
+  const SUPABASE_URL = 'https://ezpcoagdafgqodkrogms.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_d4CMWsLWgYi0sSTSgbzF9w_5Ed1iwLg';
+  const SUPABASE_TABLE = 'observations';
+  const SUPABASE_HEADERS = {
+    apikey: SUPABASE_KEY,
+    'Content-Type': 'application/json'
+  };
+
+  const seedEntries = [
+    { time:'8/29 21:10', text:'龜龜再次接近門口。本次沒有推門。推測正在研究「從哪個角度推比較自然」。', progress:'70% → 73%' },
+    { time:'8/29 19:54', text:'龜龜開始碰觸門把。目前仍未產生實際開門行為。', progress:'65% → 70%' },
+    { time:'8/28', text:'龜龜開始認真觀察門。', progress:'62%' }
+  ];
+  let logEntries = []; // 從資料庫讀回來的真實紀錄
+
+  function renderTimeline(){
+    const all = [...logEntries, ...seedEntries];
+    document.getElementById('timeline').innerHTML = all.map(e => `
+      <div class="tl-entry">
+        <div class="tl-time mono">${e.time}</div>
+        <div class="tl-body">
+          <p>${e.text}</p>
+          ${e.progress ? `<div class="tl-progress">進度：${e.progress}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function formatTimestamp(iso){
+    const d = new Date(iso);
+    return `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+  }
+
+  async function loadLogEntries(){
+    const statusEl = document.getElementById('logStatus');
+    statusEl.textContent = '正在連接資料庫…';
+    try{
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*&order=created_at.desc&limit=50`,
+        { headers: SUPABASE_HEADERS }
+      );
+      if(!res.ok) throw new Error('load failed: ' + res.status);
+      const rows = await res.json();
+      logEntries = rows.map(row => ({
+        time: formatTimestamp(row.created_at),
+        text: row.text,
+        progress: (row.progress !== null && row.progress !== undefined) ? `${row.progress}%` : ''
+      }));
+      statusEl.textContent = `已連接資料庫，共 ${logEntries.length} 筆真實紀錄（所有裝置共用）。`;
+    }catch(err){
+      logEntries = [];
+      statusEl.textContent = '資料庫連線失敗，暫時只顯示範例資料。請確認網路連線，或稍後重新整理再試。';
+    }
+    renderTimeline();
+  }
+
+  async function addLogEntry(){
+    const textEl = document.getElementById('logInput');
+    const progEl = document.getElementById('logProgress');
+    const btnEl = document.getElementById('addLogBtn');
+    const statusEl = document.getElementById('logStatus');
+    const text = textEl.value.trim();
+    if(!text){ textEl.focus(); return; }
+    const progVal = progEl.value.trim();
+
+    btnEl.disabled = true;
+    statusEl.textContent = '新增中…';
+    try{
+      const body = { text };
+      if(progVal !== '') body.progress = Number(progVal);
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+        method: 'POST',
+        headers: { ...SUPABASE_HEADERS, Prefer: 'return=minimal' },
+        body: JSON.stringify(body)
+      });
+      if(!res.ok) throw new Error('insert failed: ' + res.status);
+
+      textEl.value = '';
+      progEl.value = '';
+      if(progVal !== ''){ setProgress(Number(progVal), null); }
+
+      await loadLogEntries();
+      statusEl.textContent = `已新增並同步到資料庫！共 ${logEntries.length} 筆真實紀錄。`;
+    }catch(err){
+      statusEl.textContent = '新增失敗，請檢查網路連線，或確認 Supabase 的 Policy 是否已開放 INSERT。';
+    }finally{
+      btnEl.disabled = false;
+    }
+  }
+
+  document.getElementById('addLogBtn').addEventListener('click', addLogEntry);
+  loadLogEntries();
+
+  // ---------- tabs ----------
+  const tabBtns = document.querySelectorAll('.tabbtn');
+  const panels = document.querySelectorAll('.tabpanel');
+  tabBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      tabBtns.forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+      panels.forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+      document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+
+  // ---------- build stage track ----------
+  const track = document.getElementById('stageTrack');
+  function renderStages(currentIdx){
+    track.innerHTML = '';
+    stages.forEach((s,i)=>{
+      const el = document.createElement('div');
+      el.className = 'stage-item' + (i===currentIdx?' current':'') + (i<currentIdx?' done':'');
+      el.innerHTML = `<div class="idx mono">${String(i+1).padStart(2,'0')}</div><div class="nm">${s}</div>`;
+      track.appendChild(el);
+    });
+  }
+  function stageIndexFromProgress(p){
+    return Math.min(stages.length-1, Math.floor(p/10));
+  }
+  function updateStageBlock(){
+    const idx = stageIndexFromProgress(progress);
+    renderStages(idx);
+    document.getElementById('stageCur').textContent = `${toCircled(idx+1)} ${stages[idx]}`;
+    document.getElementById('stageDesc').textContent = stageDescs[idx];
+  }
+  function toCircled(n){
+    const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
+    return circled[n-1] || n;
+  }
+
+  function setProgress(p, animateDir){
+    progress = Math.max(0, Math.min(99, Math.round(p)));
+    document.getElementById('progressNum').textContent = progress + '%';
+    document.getElementById('progressBar').style.width = progress + '%';
+    document.getElementById('statMind').textContent = progress + '%';
+    updateStageBlock();
+    if(animateDir === 'back'){
+      sceneCard.classList.remove('advance'); void sceneCard.offsetWidth;
+      sceneCard.classList.add('shake');
+      setTimeout(()=>sceneCard.classList.remove('shake'), 700);
+    } else if(animateDir === 'forward'){
+      sceneCard.classList.remove('shake'); void sceneCard.offsetWidth;
+      sceneCard.classList.add('advance');
+      setTimeout(()=>sceneCard.classList.remove('advance'), 1000);
+    }
+  }
+
+  function setWear(w){
+    wear = Math.max(0, Math.min(99, Math.round(w)));
+    document.querySelectorAll('.wear-num').forEach(el=> el.textContent = wear + '%');
+    document.querySelectorAll('.wear-bar-inner').forEach(el=> el.style.width = wear + '%');
+  }
+
+  function setToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+  }
+
+  function randomQuote(){
+    const q = quotes[Math.floor(Math.random()*quotes.length)];
+    document.getElementById('quoteText').innerHTML = q[1] ? `${q[0]}<br>${q[1]}` : q[0];
+    document.getElementById('quoteMeta').textContent = `— 龜龜，今日第 ${touchCount} 次摸門把後`;
+  }
+
+  function nowStamp(){
+    const d = new Date();
+    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+
+  function pushWarnLog(msg){
+    warnLogEntries.unshift({time: nowStamp(), msg});
+    if(warnLogEntries.length > 8) warnLogEntries.pop();
+    const logEl = document.getElementById('warnLog');
+    logEl.innerHTML = warnLogEntries.map(e=>
+      `<div class="warn-log-item"><span>${e.msg}</span><span class="tm mono">${e.time}</span></div>`
+    ).join('');
+  }
+
+  function randomWarning(logIt){
+    const w = warnings[Math.floor(Math.random()*warnings.length)];
+    const el = document.getElementById('warnText');
+    el.parentElement.style.opacity = 0;
+    setTimeout(()=>{ el.textContent = w; el.parentElement.style.opacity = 1; }, 250);
+    if(logIt) pushWarnLog(w);
+  }
+
+  // rotate warning banner ambiently
+  setInterval(()=>randomWarning(true), 9000);
+  document.getElementById('warnRefreshBtn').addEventListener('click', ()=>randomWarning(true));
+
+  // ---------- interactions ----------
+  document.getElementById('checkBtn').addEventListener('click', ()=>{
+    const roll = Math.random();
+    let delta = 0;
+    let dir = null;
+    if(roll < 0.15){
+      delta = -(Math.random()*1.5);
+      dir = 'back';
+    } else if(roll < 0.55){
+      delta = 0;
+    } else {
+      delta = Math.random()*2.2;
+      dir = 'forward';
+    }
+    setProgress(progress + delta, dir);
+
+    touchCount += Math.random() < 0.6 ? 1 : 0;
+    document.getElementById('statTouch').textContent = touchCount + ' 次';
+    document.getElementById('behTouch').textContent = touchCount + ' 次';
+
+    setWear(wear + (Math.random()<0.5?1:0));
+
+    document.getElementById('behaviorTag').textContent = behaviorTags[Math.floor(Math.random()*behaviorTags.length)];
+    randomQuote();
+    randomWarning(false);
+
+    const msgs = [
+      "已更新最新觀測結果。龜龜仍在研究中。",
+      "本次觀測完成。偵測到極微量的『原地進展』。",
+      "已記錄一次觀察行為。龜龜狀態：一如既往地謹慎。",
+      "系統已同步。門依然沒鎖，龜龜依然知道。"
+    ];
+    setToast(msgs[Math.floor(Math.random()*msgs.length)]);
+  });
+
+  document.getElementById('pushBtn').addEventListener('click', ()=>{
+    setProgress(progress - 1, 'back');
+    document.getElementById('behaviorTag').textContent = "🐢 目前行為：看了你一眼，然後縮回殼裡";
+    setToast("「龜龜看了你一眼。」「然後縮回殼裡。」進度 -1%。");
+  });
+
+  // ---------- init ----------
+  updateStageBlock();
+  pushWarnLog("龜龜正在思考。");
+  randomWarning(false);
+</script>
+</body>
+</html>
