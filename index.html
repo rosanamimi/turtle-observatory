@@ -132,7 +132,7 @@
 
   /* ---------- section label ---------- */
   .section-label{
-    display:flex;align-items:baseline;gap:10px;margin:44px 0 18px;
+    display:flex;align-items:center;gap:10px;margin:44px 0 18px;flex-wrap:wrap;
   }
   .section-label:first-child{margin-top:22px;}
   .section-label .num{font-family:'Space Mono',monospace;color:var(--wood);font-size:13px;}
@@ -303,15 +303,63 @@
 
   /* ---------- MIX ---------- */
   .mix-card{padding:22px 24px;}
-  .mix-entry{background:var(--paper-2);border:1px solid var(--line-soft);border-radius:14px;padding:16px 18px;}
-  .mix-entry .t{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--wood);}
-  .mix-entry .row{margin-top:10px;font-size:14px;}
-  .mix-entry .row b{color:var(--green-deep);}
+  .mix-add-btn{padding:9px 18px;font-size:13.5px;box-shadow:none;}
+  .mix-table-wrap{overflow-x:auto;}
+  .mix-table{width:100%;border-collapse:collapse;min-width:680px;}
+  .mix-table thead th{
+    text-align:left;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--wood);
+    padding:0 12px 10px;border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  .mix-table tbody td{
+    padding:12px;vertical-align:top;font-size:13.5px;color:var(--ink);
+    border-bottom:1px dashed var(--line-soft);
+  }
+  .mix-table tbody tr:last-child td{border-bottom:none;}
+  .mix-table td.mix-time{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--wood-deep);white-space:nowrap;}
+  .mix-table td.mix-stage{font-weight:700;color:var(--green-deep);white-space:nowrap;}
+  .mix-empty{display:none;text-align:center;color:var(--ink-soft);font-size:13.5px;padding:20px 0;}
   .mix-warn{
     margin-top:16px;display:flex;gap:10px;align-items:flex-start;
     background:var(--warn-pale);border:1px solid #E7C79B;border-radius:12px;padding:12px 14px;
     font-size:13.5px;color:var(--wood-deep);
   }
+
+  /* ---------- modal ---------- */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;z-index:100;
+    background:rgba(46,42,32,0.45);
+    align-items:center;justify-content:center;padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    background:var(--paper);border-radius:var(--radius);border:1px solid var(--line-soft);
+    box-shadow:0 20px 50px -18px rgba(0,0,0,0.4);
+    width:100%;max-width:520px;max-height:88vh;overflow-y:auto;
+  }
+  .modal-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 22px;border-bottom:1px dashed var(--line);
+  }
+  .modal-head h3{margin:0;font-family:'Noto Serif TC',serif;font-size:18px;color:var(--green-deep);}
+  .modal-close{
+    border:none;background:var(--paper-2);width:30px;height:30px;border-radius:50%;
+    font-size:14px;color:var(--ink-soft);cursor:pointer;
+  }
+  .modal-body{padding:18px 22px;display:flex;flex-direction:column;gap:14px;}
+  .modal-body .field{display:flex;flex-direction:column;gap:6px;}
+  .modal-body input.log-textarea{resize:none;}
+  .mix-check-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:8px 14px;
+    background:var(--paper-2);border:1px solid var(--line-soft);border-radius:12px;
+    padding:12px 14px;
+  }
+  .mix-check{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink);cursor:pointer;}
+  .mix-check input{accent-color:var(--green-deep);width:16px;height:16px;flex:0 0 auto;}
+  .modal-foot{
+    display:flex;justify-content:flex-end;gap:10px;
+    padding:16px 22px;border-top:1px dashed var(--line);
+  }
+  .modal-foot .act{padding:11px 20px;font-size:14px;box-shadow:none;}
 
   /* ---------- warning tab ---------- */
   #warnBanner{
@@ -439,9 +487,9 @@
       <div class="card stat-card"><div class="ic">🚪</div><div class="lb">門</div><div class="val">未上鎖</div></div>
       <div class="card stat-card"><div class="ic">🖐️</div><div class="lb">門把</div><div class="val">已觸摸</div></div>
       <div class="card stat-card"><div class="ic">🧠</div><div class="lb">心理放行</div><div class="val" id="statMind">73%</div></div>
-      <div class="card stat-card"><div class="ic">📨</div><div class="lb">訊息準備度</div><div class="val">68%</div></div>
-      <div class="card stat-card"><div class="ic">🏃</div><div class="lb">實際行動度</div><div class="val">54%</div></div>
-      <div class="card stat-card"><div class="ic">🐚</div><div class="lb">今日退殼次數</div><div class="val">3</div></div>
+      <div class="card stat-card"><div class="ic">📨</div><div class="lb">訊息準備度</div><div class="val" id="statMsg">68%</div></div>
+      <div class="card stat-card"><div class="ic">🏃</div><div class="lb">實際行動度</div><div class="val" id="statAction">54%</div></div>
+      <div class="card stat-card"><div class="ic">🐚</div><div class="lb">今日退殼次數</div><div class="val" id="statShell">3</div></div>
       <div class="card stat-card"><div class="ic">🔁</div><div class="lb">今日研究門把</div><div class="val" id="statTouch">17 次</div></div>
     </div>
     <p class="disclaimer" style="text-align:center;">＊以上數字為人工輸入／模擬觀察資料，非真實測量結果。</p>
@@ -554,18 +602,79 @@
       <div class="timeline" id="timeline"></div>
     </div>
 
-    <div class="section-label"><span class="num mono">02 · B</span><h2>🔮 MIX 龜龜觀測站</h2><div class="rule"></div></div>
+    <div class="section-label">
+      <span class="num mono">02 · B</span><h2>🔮 MIX 龜龜觀測站</h2><div class="rule"></div>
+      <button class="act btn-primary mix-add-btn" id="mixAddBtn">＋ 新增紀錄</button>
+    </div>
     <div class="card mix-card">
-      <div class="mix-entry">
-        <div class="t mono">8/29 21:10</div>
-        <div class="row"><b>心理放行進度：</b>70～80%</div>
-        <div class="row"><b>關鍵訊號：</b>「已經知道門在哪裡，但仍在最後防備。」</div>
-        <div class="row"><b>龜龜狀態：</b>摸門把中。</div>
+      <div class="mix-table-wrap">
+        <table class="mix-table" id="mixTable">
+          <thead>
+            <tr>
+              <th>日期時間</th>
+              <th>觀測問題</th>
+              <th>MIX 組成</th>
+              <th>MIX 交集結論</th>
+              <th>進度階段</th>
+            </tr>
+          </thead>
+          <tbody id="mixTableBody"></tbody>
+        </table>
+        <p class="mix-empty" id="mixEmpty">尚無 MIX 觀測紀錄，點右上角「＋ 新增紀錄」開始記錄。</p>
       </div>
+      <p class="log-status mono" id="mixStatus">正在連接資料庫…</p>
       <div class="mix-warn">⚠️ <span><b>MIX 系統提醒：</b>請勿每三小時詢問一次同一隻龜。</span></div>
     </div>
 
   </section>
+
+  <!-- MIX 新增紀錄彈窗 -->
+  <div class="modal-overlay" id="mixModalOverlay">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3>🔮 新增 MIX 觀測紀錄</h3>
+        <button class="modal-close" id="mixModalClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label class="log-label mono">日期時間</label>
+          <input type="datetime-local" id="mixDatetime" class="log-textarea" />
+        </div>
+        <div class="field">
+          <label class="log-label mono">觀測問題</label>
+          <textarea id="mixQuestion" class="log-textarea" rows="2" placeholder="例如：截至現在，他距離第一則小訊息……"></textarea>
+        </div>
+        <div class="field">
+          <label class="log-label mono">MIX 組成（可複選）</label>
+          <div class="mix-check-grid" id="mixComponentsGrid">
+            <label class="mix-check"><input type="checkbox" value="卜卦占星">卜卦占星</label>
+            <label class="mix-check"><input type="checkbox" value="印度問事占星">印度問事占星</label>
+            <label class="mix-check"><input type="checkbox" value="奇門遁甲">奇門遁甲</label>
+            <label class="mix-check"><input type="checkbox" value="大六壬">大六壬</label>
+            <label class="mix-check"><input type="checkbox" value="太乙神數">太乙神數</label>
+            <label class="mix-check"><input type="checkbox" value="梅花易數">梅花易數</label>
+            <label class="mix-check"><input type="checkbox" value="塔羅牌">塔羅牌</label>
+            <label class="mix-check"><input type="checkbox" value="雷諾曼">雷諾曼</label>
+            <label class="mix-check"><input type="checkbox" value="盧恩占卜">盧恩占卜</label>
+            <label class="mix-check"><input type="checkbox" value="六爻">六爻</label>
+            <label class="mix-check"><input type="checkbox" value="易經占卜">易經占卜</label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="log-label mono">MIX 交集結論</label>
+          <textarea id="mixConclusion" class="log-textarea" rows="2" placeholder="例如：心理上已接近實際行動，但仍有最後的心理／行動阻力。"></textarea>
+        </div>
+        <div class="field">
+          <label class="log-label mono">進度階段</label>
+          <input type="text" id="mixStage" class="log-textarea" placeholder="例如：④ 開始準備實際行動" />
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="act btn-secondary" id="mixCancelBtn">取消</button>
+        <button class="act btn-primary" id="mixSubmitBtn">新增紀錄</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ======================= TAB3: 系統警告 ======================= -->
   <section class="tabpanel" id="tab-warn">
@@ -647,11 +756,7 @@
     'Content-Type': 'application/json'
   };
 
-  const seedEntries = [
-    { time:'8/29 21:10', text:'龜龜再次接近門口。本次沒有推門。推測正在研究「從哪個角度推比較自然」。', progress:'70% → 73%' },
-    { time:'8/29 19:54', text:'龜龜開始碰觸門把。目前仍未產生實際開門行為。', progress:'65% → 70%' },
-    { time:'8/28', text:'龜龜開始認真觀察門。', progress:'62%' }
-  ];
+  const seedEntries = []; // 已移除示範資料，只顯示 Supabase 裡的真實紀錄
   let logEntries = []; // 從資料庫讀回來的真實紀錄
 
   function renderTimeline(){
@@ -670,6 +775,35 @@
   function formatTimestamp(iso){
     const d = new Date(iso);
     return `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+  }
+
+  function todayLabel(){
+    const d = new Date();
+    return `${d.getMonth()+1}/${d.getDate()}`;
+  }
+
+  // 完全從真實觀察紀錄自動推算 Dashboard 數字，不需要手動輸入
+  function updateDashboardStats(){
+    const today = todayLabel();
+    const todays = logEntries.filter(e => e.time.startsWith(today));
+    const touchesToday = todays.length;
+    const retreatToday = todays.filter(e => /退|縮|躲|逃/.test(e.text)).length;
+
+    // 拿最新一筆有填進度的紀錄，同步全域 progress 狀態
+    const latestWithProgress = logEntries.find(e => e.progress);
+    if(latestWithProgress){
+      const num = parseInt(latestWithProgress.progress, 10);
+      if(!isNaN(num)) setProgress(num, null);
+    }
+
+    const msgReady = Math.max(0, Math.min(99, Math.round(progress - 5 + touchesToday * 3)));
+    const actionLevel = Math.max(0, Math.min(99, Math.round(touchesToday * 9 + progress / 3 - retreatToday * 4)));
+
+    document.getElementById('statMsg').textContent = msgReady + '%';
+    document.getElementById('statAction').textContent = actionLevel + '%';
+    document.getElementById('statShell').textContent = retreatToday + ' 次';
+    document.getElementById('statTouch').textContent = touchesToday + ' 次';
+    document.getElementById('behTouch').textContent = touchesToday + ' 次';
   }
 
   async function loadLogEntries(){
@@ -693,6 +827,7 @@
       statusEl.textContent = '資料庫連線失敗，暫時只顯示範例資料。請確認網路連線，或稍後重新整理再試。';
     }
     renderTimeline();
+    updateDashboardStats();
   }
 
   async function addLogEntry(){
@@ -731,6 +866,126 @@
 
   document.getElementById('addLogBtn').addEventListener('click', addLogEntry);
   loadLogEntries();
+
+  // ---------- MIX 龜龜觀測站（獨立的 Supabase 資料表：mix_observations） ----------
+  const MIX_TABLE = 'mix_observations';
+  let mixEntries = [];
+
+  function formatMixTime(iso){
+    if(!iso) return '';
+    const d = new Date(iso);
+    const p = n => n.toString().padStart(2,'0');
+    return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  }
+
+  function escapeHtml(s){
+    return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderMixTable(){
+    const body = document.getElementById('mixTableBody');
+    const empty = document.getElementById('mixEmpty');
+    const table = document.getElementById('mixTable');
+    if(mixEntries.length === 0){
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    table.style.display = '';
+    empty.style.display = 'none';
+    body.innerHTML = mixEntries.map(e => `
+      <tr>
+        <td class="mix-time">${formatMixTime(e.observed_at)}</td>
+        <td>${escapeHtml(e.question)}</td>
+        <td>${escapeHtml(e.mix_components)}</td>
+        <td>${escapeHtml(e.conclusion)}</td>
+        <td class="mix-stage">${escapeHtml(e.stage)}</td>
+      </tr>
+    `).join('');
+  }
+
+  async function loadMixEntries(){
+    const statusEl = document.getElementById('mixStatus');
+    statusEl.textContent = '正在連接資料庫…';
+    try{
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/${MIX_TABLE}?select=*&order=observed_at.desc&limit=50`,
+        { headers: SUPABASE_HEADERS }
+      );
+      if(!res.ok) throw new Error('load failed: ' + res.status);
+      mixEntries = await res.json();
+      statusEl.textContent = `已連接資料庫，共 ${mixEntries.length} 筆 MIX 觀測紀錄。`;
+    }catch(err){
+      mixEntries = [];
+      statusEl.textContent = '資料庫連線失敗，請確認 mix_observations 這張表已建立且 Policy 已開放。';
+    }
+    renderMixTable();
+  }
+
+  function openMixModal(){
+    const now = new Date();
+    const p = n => n.toString().padStart(2,'0');
+    const localVal = `${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}T${p(now.getHours())}:${p(now.getMinutes())}`;
+    document.getElementById('mixDatetime').value = localVal;
+    document.getElementById('mixQuestion').value = '';
+    document.querySelectorAll('#mixComponentsGrid input[type=checkbox]').forEach(cb => cb.checked = false);
+    document.getElementById('mixConclusion').value = '';
+    document.getElementById('mixStage').value = '';
+    document.getElementById('mixModalOverlay').classList.add('open');
+  }
+  function closeMixModal(){
+    document.getElementById('mixModalOverlay').classList.remove('open');
+  }
+
+  async function submitMixEntry(){
+    const dtEl = document.getElementById('mixDatetime');
+    const qEl = document.getElementById('mixQuestion');
+    const ccEl = document.getElementById('mixConclusion');
+    const sEl = document.getElementById('mixStage');
+    const btnEl = document.getElementById('mixSubmitBtn');
+
+    if(!qEl.value.trim()){ qEl.focus(); return; }
+
+    const selectedComponents = Array.from(
+      document.querySelectorAll('#mixComponentsGrid input[type=checkbox]:checked')
+    ).map(cb => cb.value);
+
+    const body = {
+      observed_at: dtEl.value ? new Date(dtEl.value).toISOString() : new Date().toISOString(),
+      question: qEl.value.trim(),
+      mix_components: selectedComponents.join('＋'),
+      conclusion: ccEl.value.trim(),
+      stage: sEl.value.trim()
+    };
+
+    btnEl.disabled = true;
+    btnEl.textContent = '新增中…';
+    try{
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/${MIX_TABLE}`, {
+        method: 'POST',
+        headers: { ...SUPABASE_HEADERS, Prefer: 'return=minimal' },
+        body: JSON.stringify(body)
+      });
+      if(!res.ok) throw new Error('insert failed: ' + res.status);
+      closeMixModal();
+      await loadMixEntries();
+    }catch(err){
+      alert('新增失敗，請確認 mix_observations 資料表與 Policy 是否設定正確。');
+    }finally{
+      btnEl.disabled = false;
+      btnEl.textContent = '新增紀錄';
+    }
+  }
+
+  document.getElementById('mixAddBtn').addEventListener('click', openMixModal);
+  document.getElementById('mixModalClose').addEventListener('click', closeMixModal);
+  document.getElementById('mixCancelBtn').addEventListener('click', closeMixModal);
+  document.getElementById('mixModalOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'mixModalOverlay') closeMixModal();
+  });
+  document.getElementById('mixSubmitBtn').addEventListener('click', submitMixEntry);
+
+  loadMixEntries();
 
   // ---------- tabs ----------
   const tabBtns = document.querySelectorAll('.tabbtn');
