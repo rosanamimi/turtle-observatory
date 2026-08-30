@@ -2,7 +2,7 @@
 
 一個半認真、半荒謬的「龜龜推門進度監測 Dashboard」。持續觀察一隻正在考慮推門的龜。
 
-🔗 Live: _(部署後把網址貼在這裡)_
+🔗 Live:[ https://rosanamimi.github.io/turtle-observatory/]
 
 ## 專案結構
 
