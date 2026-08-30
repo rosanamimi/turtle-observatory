@@ -320,7 +320,7 @@
   .mix-card{padding:22px 24px;}
   .mix-add-btn{padding:9px 18px;font-size:13.5px;box-shadow:none;}
   .mix-table-wrap{overflow-x:auto;}
-  .mix-table{width:100%;border-collapse:collapse;min-width:680px;}
+  .mix-table{width:100%;border-collapse:collapse;min-width:820px;table-layout:fixed;}
   .mix-table thead th{
     text-align:left;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--wood);
     padding:0 12px 10px;border-bottom:1px solid var(--line);white-space:nowrap;
@@ -328,10 +328,11 @@
   .mix-table tbody td{
     padding:12px;vertical-align:top;font-size:13.5px;color:var(--ink);
     border-bottom:1px dashed var(--line-soft);
+    white-space:normal;word-break:break-word;overflow-wrap:anywhere;line-height:1.65;
   }
   .mix-table tbody tr:last-child td{border-bottom:none;}
   .mix-table td.mix-time{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--wood-deep);white-space:nowrap;}
-  .mix-table td.mix-stage{font-weight:700;color:var(--green-deep);white-space:nowrap;}
+  .mix-table td.mix-stage{font-weight:700;color:var(--green-deep);white-space:normal;}
   .mix-empty{display:none;text-align:center;color:var(--ink-soft);font-size:13.5px;padding:20px 0;}
   .mix-warn{
     margin-top:16px;display:flex;gap:10px;align-items:flex-start;
@@ -498,9 +499,9 @@
     <!-- 今日觀察 Dashboard -->
     <div class="section-label"><span class="num mono">HOME · 01</span><h2>今日觀察 Dashboard</h2><div class="rule"></div></div>
     <div class="stats-grid" id="statsGrid">
-      <div class="card stat-card"><div class="ic">🐢</div><div class="lb">龜龜位置</div><div class="val">門前</div></div>
-      <div class="card stat-card"><div class="ic">🚪</div><div class="lb">門</div><div class="val">未上鎖</div></div>
-      <div class="card stat-card"><div class="ic">🖐️</div><div class="lb">門把</div><div class="val">已觸摸</div></div>
+      <div class="card stat-card"><div class="ic">🐢</div><div class="lb">龜龜位置</div><div class="val" id="statLocation">門前</div></div>
+      <div class="card stat-card"><div class="ic">🚪</div><div class="lb">門</div><div class="val" id="statDoor">未上鎖</div></div>
+      <div class="card stat-card"><div class="ic">🖐️</div><div class="lb">門把</div><div class="val" id="statHandle">已觸摸</div></div>
       <div class="card stat-card"><div class="ic">🧠</div><div class="lb">心理放行</div><div class="val" id="statMind">73%</div></div>
       <div class="card stat-card"><div class="ic">📨</div><div class="lb">訊息準備度</div><div class="val" id="statMsg">68%</div></div>
       <div class="card stat-card"><div class="ic">🏃</div><div class="lb">實際行動度</div><div class="val" id="statAction">54%</div></div>
@@ -509,19 +510,8 @@
     </div>
     <p class="disclaimer" style="text-align:center;">＊以上數字為人工輸入／模擬觀察資料，非真實測量結果。</p>
 
-    <!-- 門把健康狀況（首頁摘要版） -->
-    <div class="section-label"><span class="num mono">HOME · 02</span><h2>🖐️ 門把健康狀況</h2><div class="rule"></div></div>
-    <div class="card wear-card compact">
-      <div class="wear-head">
-        <h3>磨損程度</h3>
-        <span class="wear-num mono">81%</span>
-      </div>
-      <div class="wear-bar-outer"><div class="wear-bar-inner" style="width:81%;"></div></div>
-      <div class="wear-quotes"><p>「龜龜每天摸，門把已經開始懷疑人生。」</p></div>
-    </div>
-
     <!-- 龜龜今日語錄 -->
-    <div class="section-label"><span class="num mono">HOME · 03</span><h2>💬 龜龜今日語錄</h2><div class="rule"></div></div>
+    <div class="section-label"><span class="num mono">HOME · 02</span><h2>💬 龜龜今日語錄</h2><div class="rule"></div></div>
     <div class="card quote-card">
       <div class="q-label mono">DAILY QUOTE</div>
       <blockquote id="quoteText">「我不是不推。」<br>「我只是還在研究。」</blockquote>
@@ -567,15 +557,15 @@
 
     <div class="section-label"><span class="num mono">01 · C</span><h2>🐢 龜龜今日行為統計</h2><div class="rule"></div></div>
     <div class="behavior-grid">
-      <div class="card beh-card"><div class="ic">👀</div><div class="lb">偷看門</div><div class="n">23 次</div></div>
-      <div class="card beh-card"><div class="ic">🚶</div><div class="lb">靠近門</div><div class="n">11 次</div></div>
+      <div class="card beh-card"><div class="ic">👀</div><div class="lb">偷看門</div><div class="n" id="behPeek">23 次</div></div>
+      <div class="card beh-card"><div class="ic">🚶</div><div class="lb">靠近門</div><div class="n" id="behApproach">11 次</div></div>
       <div class="card beh-card"><div class="ic">🖐️</div><div class="lb">摸門把</div><div class="n" id="behTouch">17 次</div></div>
-      <div class="card beh-card"><div class="ic">🧠</div><div class="lb">研究開門方式</div><div class="n">8 次</div></div>
-      <div class="card beh-card"><div class="ic">↩️</div><div class="lb">突然退回去</div><div class="n">4 次</div></div>
-      <div class="card beh-card"><div class="ic">🐚</div><div class="lb">縮進殼裡</div><div class="n">3 次</div></div>
-      <div class="card beh-card"><div class="ic">📨</div><div class="lb">準備傳訊息</div><div class="n">2 次</div></div>
-      <div class="card beh-card zero"><div class="ic">🚪</div><div class="lb">真正推門</div><div class="n">0 次</div></div>
-      <div class="card beh-card zero"><div class="ic">🎉</div><div class="lb">成功開門</div><div class="n">0 次</div></div>
+      <div class="card beh-card"><div class="ic">🧠</div><div class="lb">研究開門方式</div><div class="n" id="behResearch">8 次</div></div>
+      <div class="card beh-card"><div class="ic">↩️</div><div class="lb">突然退回去</div><div class="n" id="behRetreat">4 次</div></div>
+      <div class="card beh-card"><div class="ic">🐚</div><div class="lb">縮進殼裡</div><div class="n" id="behShell">3 次</div></div>
+      <div class="card beh-card"><div class="ic">📨</div><div class="lb">準備傳訊息</div><div class="n" id="behPrep">2 次</div></div>
+      <div class="card beh-card zero" id="behPushCard"><div class="ic">🚪</div><div class="lb">真正推門</div><div class="n" id="behPush">0 次</div></div>
+      <div class="card beh-card zero" id="behOpenCard"><div class="ic">🎉</div><div class="lb">成功開門</div><div class="n" id="behOpen">0 次</div></div>
     </div>
 
     <div class="section-label"><span class="num mono">01 · D</span><h2>🖐️ 門把健康狀況</h2><div class="rule"></div></div>
@@ -646,6 +636,13 @@
     <div class="card mix-card">
       <div class="mix-table-wrap">
         <table class="mix-table" id="mixTable">
+          <colgroup>
+            <col style="width:120px">
+            <col style="width:22%">
+            <col style="width:16%">
+            <col style="width:28%">
+            <col style="width:16%">
+          </colgroup>
           <thead>
             <tr>
               <th>日期時間</th>
@@ -834,23 +831,116 @@
     return `${d.getMonth()+1}/${d.getDate()}`;
   }
 
-  // 完全從真實觀察紀錄自動推算 Dashboard 數字，不需要手動輸入
+  // 階段對照表：MIX stage 開頭圈數字 → 索引 0~5
+  const STAGE_ORDER = ['①','②','③','④','⑤','⑥'];
+  function stageIndexOf(stageStr){
+    if(!stageStr) return null;
+    const ch = stageStr.trim().charAt(0);
+    const idx = STAGE_ORDER.indexOf(ch);
+    return idx === -1 ? null : idx;
+  }
+
+  const LOCATION_BY_STAGE = ['遠處觀望','靠近門口','門前','門把旁','手已放上門把','門後'];
+  const MIND_BASELINE_BY_STAGE = [20, 40, 60, 75, 90, 99];
+  const MSG_MID_BY_STAGE = [15, 38, 58, 75, 90, 99]; // 訊息準備度區間取中間值：10–20/30–45/50–65/70–80/85–95/99
+  const MIND_DECREASE_KW = /阻力加重|退縮|重新封閉|不安全感上升/;
+  const MIND_INCREASE_KW = /阻力鬆動|開始解除|更能接受主動|接近行動/;
+  const TOUCH_KEYWORDS = /摸門把|研究門把|確認門把|看門|靠近|找理由|想傳|打開對話框|想訊息內容/;
+
+  // 完全從真實觀察紀錄（observations）＋ MIX 推測（mix_observations）自動推算 Dashboard 數字
   function updateDashboardStats(){
     const today = todayLabel();
     const todays = logEntries.filter(e => e.time.startsWith(today));
-    const touchesToday = todays.length;
+
+    // 今日研究門把：文字命中任一關鍵字就算一次
+    const touchesToday = todays.filter(e => TOUCH_KEYWORDS.test(e.text)).length;
+
+    // 今日退殼次數：文字含 退／縮／躲／逃
     const retreatToday = todays.filter(e => /退|縮|躲|逃/.test(e.text)).length;
 
-    // 拿最新一筆有填進度的紀錄，同步全域 progress 狀態
-    const latestWithProgress = logEntries.find(e => e.progress);
-    if(latestWithProgress){
-      const num = parseInt(latestWithProgress.progress, 10);
-      if(!isNaN(num)) setProgress(num, null);
+    // 最新一筆 MIX（mixEntries 已依 observed_at desc 排序，index 0 為最新）
+    const latestMix = (typeof mixEntries !== 'undefined' && mixEntries.length > 0) ? mixEntries[0] : null;
+    const stageIdx = latestMix ? stageIndexOf(latestMix.stage) : null;
+
+    // 🐢 龜龜位置：跟著最新 MIX stage
+    const location = stageIdx !== null ? LOCATION_BY_STAGE[stageIdx] : '門前';
+
+    // 🚪 門：真實事件優先於 MIX 推測，一旦真的發生過就不會再退回鎖住狀態
+    const hasRealEvent = logEntries.some(e => e.hasEvent);
+    let door;
+    if(hasRealEvent){
+      door = '已開';
+    } else if(latestMix && latestMix.conclusion){
+      const c = latestMix.conclusion;
+      if(/已關閉|結束|沒有可能|不應再接觸/.test(c)) door = '已上鎖';
+      else door = '未上鎖'; // 含「保留可能性／暫停／可以重新建立／等待時機」或無明確訊號都算未上鎖
+    } else {
+      door = '未上鎖';
     }
 
-    const msgReady = Math.max(0, Math.min(99, Math.round(progress - 5 + touchesToday * 3)));
-    const actionLevel = Math.max(0, Math.min(99, Math.round(touchesToday * 9 + progress / 3 - retreatToday * 4)));
+    // 🖐️ 門把
+    const handleKeyword = /摸門把|研究門把|確認門把|找理由|想傳|準備訊息|差最後一步/;
+    const recentHandleSignal = logEntries.slice(0, 10).some(e => handleKeyword.test(e.text));
+    let handle;
+    if(stageIdx === 5) handle = '已放開門把／訊息已出';
+    else if(stageIdx === 4) handle = '已握住／發送前';
+    else if((stageIdx !== null && stageIdx >= 2) || recentHandleSignal) handle = '已觸摸';
+    else handle = '尚未觸摸';
 
+    // 🧠 心理放行：MIX stage 對應基準值，再依最新 3 筆 MIX 的用詞加分／扣分
+    let mindPercent = stageIdx !== null ? MIND_BASELINE_BY_STAGE[stageIdx] : progress;
+    if(typeof mixEntries !== 'undefined' && mixEntries.length > 0){
+      let mindAdjust = 0;
+      mixEntries.slice(0, 3).forEach(m => {
+        const t = `${m.conclusion || ''} ${m.question || ''}`;
+        if(MIND_DECREASE_KW.test(t)) mindAdjust -= 8;
+        if(MIND_INCREASE_KW.test(t)) mindAdjust += 8;
+      });
+      mindAdjust = Math.max(-20, Math.min(20, mindAdjust));
+      mindPercent = Math.max(0, Math.min(99, Math.round(mindPercent + mindAdjust)));
+    }
+    setProgress(mindPercent, null);
+
+    // 📨 訊息準備度：直接取該 MIX 階段的區間中間值
+    const msgReady = stageIdx !== null ? MSG_MID_BY_STAGE[stageIdx] : Math.round(mindPercent * 0.9);
+
+    // 🏃 實際行動度：只看真實事件的質性分級，不摻 MIX 推測
+    // Lv3 95–99%｜已建立真正互動（通話／面對面等深度接觸）
+    // Lv2 80–95%｜已實際送出文字訊息
+    // Lv1 30–50%｜有準備訊息但還沒送
+    const hasDeepEvent = logEntries.some(e => e.hasEvent && /通話|面對面|見面|語音|視訊/.test(e.eventType));
+    const hasTextEvent = logEntries.some(e => e.hasEvent && /文字|訊息|簡訊|line|Line|LINE/i.test(e.eventType));
+    const hasPrepSignal = logEntries.some(e => /準備訊息|想傳|打開對話框|想訊息內容/.test(e.text));
+    let actionLevel = 0;
+    if(hasDeepEvent) actionLevel = 97;
+    else if(hasTextEvent) actionLevel = 88;
+    else if(hasPrepSignal) actionLevel = 40;
+
+    // ---------- 龜龜今日行為統計（TAB1）也吃同一批真實資料 ----------
+    const peekToday = todays.filter(e => /看門/.test(e.text)).length;
+    const approachToday = todays.filter(e => /靠近/.test(e.text)).length;
+    const researchToday = todays.filter(e => /研究/.test(e.text)).length;
+    const suddenRetreatToday = todays.filter(e => /退/.test(e.text)).length;
+    const shellToday = todays.filter(e => /縮/.test(e.text)).length;
+    const prepToday = todays.filter(e => /準備訊息|想傳/.test(e.text)).length;
+    // 「真正推門」「成功開門」是里程碑事件，看全部真實紀錄有沒有發生過，不侷限今天
+    const pushCount = logEntries.filter(e => e.hasEvent && /文字|訊息|簡訊|line|Line|LINE/i.test(e.eventType)).length;
+    const openCount = logEntries.filter(e => e.hasEvent && /通話|面對面|見面|語音|視訊/.test(e.eventType)).length;
+
+    document.getElementById('behPeek').textContent = peekToday + ' 次';
+    document.getElementById('behApproach').textContent = approachToday + ' 次';
+    document.getElementById('behResearch').textContent = researchToday + ' 次';
+    document.getElementById('behRetreat').textContent = suddenRetreatToday + ' 次';
+    document.getElementById('behShell').textContent = shellToday + ' 次';
+    document.getElementById('behPrep').textContent = prepToday + ' 次';
+    document.getElementById('behPush').textContent = pushCount + ' 次';
+    document.getElementById('behOpen').textContent = openCount + ' 次';
+    document.getElementById('behPushCard').classList.toggle('zero', pushCount === 0);
+    document.getElementById('behOpenCard').classList.toggle('zero', openCount === 0);
+
+    document.getElementById('statLocation').textContent = location;
+    document.getElementById('statDoor').textContent = door;
+    document.getElementById('statHandle').textContent = handle;
     document.getElementById('statMsg').textContent = msgReady + '%';
     document.getElementById('statAction').textContent = actionLevel + '%';
     document.getElementById('statShell').textContent = retreatToday + ' 次';
@@ -870,6 +960,7 @@
       const rows = await res.json();
       logEntries = rows.map(row => ({
         time: formatTimestamp(row.created_at),
+        createdAtRaw: row.created_at,
         text: row.text,
         progress: (row.progress !== null && row.progress !== undefined) ? `${row.progress}%` : '',
         hasEvent: !!row.has_event,
@@ -999,6 +1090,7 @@
       statusEl.textContent = '資料庫連線失敗，請確認 mix_observations 這張表已建立且 Policy 已開放。';
     }
     renderMixTable();
+    if(typeof updateDashboardStats === 'function') updateDashboardStats();
   }
 
   function openMixModal(){
