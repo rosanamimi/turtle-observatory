@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>雲養龜觀察所｜LIVE OBSERVATION</title>
+<title>雲養龜觀察所｜星象觀測檔案</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -47,9 +47,10 @@
   body{
     margin:0;
     background:
-      radial-gradient(900px 520px at 12% -10%, rgba(139,124,246,0.12) 0%, transparent 62%),
-      radial-gradient(700px 460px at 94% 2%, rgba(120,200,255,0.06) 0%, transparent 55%),
-      radial-gradient(1000px 700px at 50% 112%, rgba(139,124,246,0.11) 0%, transparent 62%),
+      radial-gradient(1000px 600px at 10% -12%, rgba(150,130,246,0.13) 0%, transparent 65%),
+      radial-gradient(800px 520px at 96% 4%, rgba(214,160,255,0.055) 0%, transparent 60%),
+      radial-gradient(760px 520px at 50% -6%, rgba(255,205,150,0.035) 0%, transparent 58%),
+      radial-gradient(1100px 760px at 50% 114%, rgba(150,130,246,0.11) 0%, transparent 64%),
       linear-gradient(180deg, #050310 0%, #0C0722 42%, #05030D 100%);
     background-attachment: fixed;
     color:var(--ink);
@@ -75,14 +76,19 @@
     background-size: 100% 100%;
     animation: starsDrift 70s linear infinite;
   }
-  /* 大型星軌幾何線：局部露出，非常淡，作為背景語言 */
+  /* 低調星盤刻度環：以 conic-gradient 產生 12 宮刻線，再用 radial mask 裁成細環，
+     取代原本單純的軌道圓圈，作為「占星盤」的背景語彙，非常淡、不搶視覺 */
   body::after{
     content:'';
     position:fixed; z-index:-1; pointer-events:none;
     top:-28vw; right:-24vw;
     width:62vw; height:62vw;
     border-radius:50%;
-    border:1px solid rgba(150,140,220,0.06);
+    background:
+      repeating-conic-gradient(rgba(203,174,115,0.16) 0deg 0.6deg, transparent 0.6deg 30deg),
+      radial-gradient(circle, transparent 0%, transparent 96%, rgba(150,140,220,0.05) 97%, transparent 98%);
+    -webkit-mask-image: radial-gradient(circle, transparent 63%, #000 64%, #000 67%, transparent 68%);
+            mask-image: radial-gradient(circle, transparent 63%, #000 64%, #000 67%, transparent 68%);
     animation: orbitBreathe 30s ease-in-out infinite;
   }
   @keyframes starsDrift{
@@ -91,8 +97,8 @@
     100%{ transform:translate(0,0); }
   }
   @keyframes orbitBreathe{
-    0%,100%{ opacity:0.6; }
-    50%{ opacity:1; }
+    0%,100%{ opacity:0.55; }
+    50%{ opacity:0.9; }
   }
   .mono{font-family:'Space Mono', monospace;}
   .serif{font-family:'Noto Serif TC', serif;}
@@ -118,7 +124,7 @@
   /* ---------- top ticker ---------- */
   .ticker{
     background:#0B0A22;
-    color:#B7ACEB;
+    color:#E6E1FA;
     font-family:'Space Mono',monospace;
     font-size:12px;
     letter-spacing:.04em;
@@ -133,6 +139,7 @@
     padding-left:100%;
     animation: ticker 26s linear infinite;
   }
+  .ticker-track .tk-mark{color:var(--wood);}
   @keyframes ticker{ from{transform:translateX(0);} to{transform:translateX(-100%);} }
 
   /* ---------- header ---------- */
@@ -147,11 +154,14 @@
       radial-gradient(circle at 50% 50%, rgba(139,124,246,0.05) 0%, transparent 65%);
   }
   header::after{
+    /* 月相：以 radial-gradient 遮罩裁出弦月形狀，取代原本的科技感虛線圓圈 */
     content:'';position:absolute;z-index:0;pointer-events:none;
-    top:6%;right:8%;
-    width:260px;height:260px;
+    top:8%;right:9%;
+    width:120px;height:120px;
     border-radius:50%;
-    border:1px dashed rgba(203,174,115,0.10);
+    background:rgba(203,174,115,0.20);
+    -webkit-mask-image: radial-gradient(circle at 64% 46%, transparent 54%, #000 55%);
+            mask-image: radial-gradient(circle at 64% 46%, transparent 54%, #000 55%);
   }
   header > *{position:relative;z-index:1;}
   .eyebrow{
@@ -161,7 +171,7 @@
     border:1px solid rgba(156,141,247,0.18);
     padding:5px 12px;border-radius:100px;
   }
-  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#7EEAC0;box-shadow:0 0 6px 0.5px rgba(126,234,192,.4);animation:pulse 2s infinite;}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--wood);box-shadow:0 0 7px 1px rgba(203,174,115,.45);animation:pulse 2s infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
   h1.title{
     font-family:'Noto Serif TC',serif;
@@ -535,49 +545,69 @@
   .final-slogan .locked{color:var(--wood-deep);}
 
   /* =====================================================================
-     HOME — 觀測站首頁重新設計（僅作用於 #tab-home，不影響其他分頁樣式）
-     方向：深夜星空、天文觀測感、大量留白、暖金點綴、去 Dashboard 化
+     HOME 第一屏 — 沉浸式龜龜觀測場景（僅作用於 #tab-home，不影響其他分頁樣式）
+     方向：Hero 為第一視覺主角，只留階段／心理放行／位置摘要三項核心狀態，
+     其餘數據降權移到 Hero 之後；星盤／星座／月相融入場景光暈，不做成 HUD 標籤
      ===================================================================== */
   #tab-home{padding-top:4px;}
 
+  .scene-hero{position:relative;max-width:760px;margin:14px auto 0;}
+  /* 龜座：把龜龜畫成一個虛構的小星座，非常淡地融進整個場景背後的光暈裡，
+     刻意不加外框、不加文字標籤，避免讀成 HUD 準星 */
+  .scene-hero::before{
+    content:'';
+    position:absolute;
+    inset:-16% -14%;
+    z-index:0;
+    pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220'%3E%3Cg fill='none' stroke='rgba(203,196,255,0.30)' stroke-width='1'%3E%3Cline x1='160' y1='18' x2='105' y2='55'/%3E%3Cline x1='160' y1='18' x2='215' y2='55'/%3E%3Cline x1='105' y1='55' x2='215' y2='55'/%3E%3Cline x1='215' y1='55' x2='250' y2='110'/%3E%3Cline x1='250' y1='110' x2='215' y2='165'/%3E%3Cline x1='215' y1='165' x2='105' y2='165'/%3E%3Cline x1='105' y1='165' x2='70' y2='110'/%3E%3Cline x1='70' y1='110' x2='105' y2='55'/%3E%3Cline x1='105' y1='55' x2='55' y2='50'/%3E%3Cline x1='215' y1='55' x2='265' y2='50'/%3E%3Cline x1='105' y1='165' x2='55' y2='170'/%3E%3Cline x1='215' y1='165' x2='265' y2='170'/%3E%3Cline x1='215' y1='165' x2='160' y2='200'/%3E%3Cline x1='105' y1='165' x2='160' y2='200'/%3E%3C/g%3E%3Cg fill='rgba(236,235,250,0.55)'%3E%3Ccircle cx='160' cy='18' r='2.2'/%3E%3Ccircle cx='105' cy='55' r='2.4'/%3E%3Ccircle cx='215' cy='55' r='2.4'/%3E%3Ccircle cx='250' cy='110' r='2'/%3E%3Ccircle cx='215' cy='165' r='2.4'/%3E%3Ccircle cx='105' cy='165' r='2.4'/%3E%3Ccircle cx='70' cy='110' r='2'/%3E%3Ccircle cx='55' cy='50' r='1.8'/%3E%3Ccircle cx='265' cy='50' r='1.8'/%3E%3Ccircle cx='55' cy='170' r='1.8'/%3E%3Ccircle cx='265' cy='170' r='1.8'/%3E%3Ccircle cx='160' cy='200' r='1.8'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:92% auto;
+    opacity:.45;
+  }
+  .scene-hero .stage-wrap{position:relative;z-index:1;padding:0;display:flex;justify-content:center;}
+  .scene-hero .behavior-line{position:relative;z-index:1;margin-top:16px;}
+
   #tab-home #heroImg{
-    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.6), 0 0 46px -14px rgba(203,174,115,0.22);
+    width:100%;max-width:760px;
+    position:relative;z-index:1;
+    box-shadow: 0 30px 80px -22px rgba(0,0,0,0.65), 0 0 90px -18px rgba(170,140,255,0.24), 0 0 50px -12px rgba(203,174,115,0.20);
   }
 
-  .obs-hero{
-    display:grid;
-    grid-template-columns:1.35fr 1fr;
-    gap:56px;
-    align-items:start;
-    margin-top:10px;
+  /* 核心狀態：階段徽章 + 心理放行大字 + 位置摘要一行，安靜地置中在 Hero 之下 */
+  .scene-status{max-width:520px;margin:40px auto 0;text-align:center;}
+  .scene-stage-badge{
+    display:block;
+    font-family:'Noto Serif TC',serif;font-size:13.5px;letter-spacing:.06em;
+    color:var(--wood);opacity:.9;margin:0 0 10px;
   }
-  .obs-hero-visual{position:relative;}
-  .obs-eyebrow{
-    display:flex;align-items:center;gap:8px;
-    font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;
-    color:var(--wood);opacity:.85;margin:0 0 14px;
+  .scene-primary-label{
+    display:block;font-family:'Noto Serif TC',serif;font-size:16px;color:var(--ink-soft);margin:0 0 6px;
   }
-  .obs-hero-visual .stage-wrap{padding:0;}
+  .scene-primary-value{
+    display:block;font-family:'Space Mono',monospace;font-weight:700;
+    font-size:56px;line-height:1;color:var(--wood);
+    text-shadow:0 0 26px rgba(203,174,115,0.35), 0 0 54px rgba(170,140,255,0.15);
+  }
+  .scene-summary-line{
+    margin-top:16px;font-family:'Space Mono',monospace;font-size:13.5px;
+    color:var(--ink-soft);letter-spacing:.02em;
+  }
 
-  .obs-readout{padding-top:2px;}
-  .obs-readout-list{border-top:1px solid var(--line-soft);margin-top:2px;}
-  .obs-row{
-    display:flex;justify-content:space-between;align-items:baseline;gap:14px;
-    padding:15px 0;border-bottom:1px solid var(--line-soft);
+  /* 次要數據：降低視覺權重，移到 Hero／核心狀態之後 */
+  .scene-secondary{
+    max-width:640px;margin:44px auto 0;padding-top:20px;
+    border-top:1px solid var(--line-soft);
+    display:flex;flex-wrap:wrap;justify-content:center;gap:10px 22px;
+    font-size:12.5px;color:var(--ink-soft);
   }
-  .obs-row .obs-k{font-size:13.5px;color:var(--ink-soft);}
-  .obs-row .obs-v{font-family:'Space Mono',monospace;font-size:15px;color:var(--ink);font-weight:700;white-space:nowrap;}
-  .obs-row-major{padding:22px 0 26px;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:8px;}
-  .obs-row-major .obs-k{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--ink);}
-  .obs-row-major .obs-v{
-    font-family:'Space Mono',monospace;font-weight:700;
-    font-size:52px;line-height:1;color:var(--wood);
-    text-shadow:0 0 24px rgba(203,174,115,0.35);
-  }
+  .scene-secondary b{font-family:'Space Mono',monospace;color:var(--ink-soft);font-weight:700;}
+
   .obs-disclaimer{font-size:12px;color:var(--ink-soft);font-style:italic;margin:18px 0 0;}
 
   .obs-quote-block{
-    max-width:640px;margin:76px 0 0;padding-left:24px;
+    max-width:640px;margin:76px auto 0;padding-left:24px;
     border-left:2px solid var(--wood-deep);
   }
   .obs-quote-block .q-label{font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:.12em;color:var(--wood);}
@@ -587,23 +617,19 @@
   }
   .obs-quote-meta{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);}
 
-  .obs-controls{display:flex;flex-wrap:wrap;gap:16px;justify-content:flex-start;margin-top:60px;}
+  .obs-controls{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:60px;}
   .obs-btn-primary{background:transparent;color:var(--wood);border:1px solid rgba(203,174,115,0.5);box-shadow:none;}
   .obs-btn-primary:hover{background:rgba(203,174,115,0.08);}
   .obs-btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line);box-shadow:none;}
   .obs-btn-ghost:hover{color:var(--ink);border-color:rgba(255,255,255,0.28);}
 
-  @media (max-width:900px){
-    .obs-hero{grid-template-columns:1fr;gap:34px;}
-  }
   @media (max-width:640px){
     .stats-grid{grid-template-columns:repeat(2,1fr);}
     .behavior-grid{grid-template-columns:repeat(2,1fr);}
     .mini-hints{grid-template-columns:1fr;}
     .tabbtn{font-size:12.5px;padding:10px 12px;}
-    .obs-row-major .obs-v{font-size:42px;}
+    .scene-primary-value{font-size:44px;}
     .obs-quote-block{margin-top:52px;padding-left:18px;}
-    .obs-controls{justify-content:center;}
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -613,12 +639,12 @@
 </head>
 <body>
 
-<div class="ticker"><div class="ticker-track mono" id="tickerTrack">⚠ 龜龜正在思考　　⚠ 門沒有上鎖　　⚠ 龜龜仍未推門　　⚠ 門把磨損程度正在上升　　⚠ 請勿催促龜龜　　⚠ 何用作福問神仙　　⚠ 龜龜正在思考　　⚠ 門沒有上鎖　　⚠ 龜龜仍未推門　　⚠ 門把磨損程度正在上升　　⚠ 請勿催促龜龜　　⚠ 何用作福問神仙　　</div></div>
+<div class="ticker"><div class="ticker-track mono" id="tickerTrack"><span class="tk-mark">✦</span> 龜龜正在思考　　<span class="tk-mark">✦</span> 門沒有上鎖　　<span class="tk-mark">✦</span> 龜龜仍未推門　　<span class="tk-mark">✦</span> 門把磨損程度正在上升　　<span class="tk-mark">✦</span> 請勿催促龜龜　　<span class="tk-mark">✦</span> 何用作福問神仙　　<span class="tk-mark">✦</span> 龜龜正在思考　　<span class="tk-mark">✦</span> 門沒有上鎖　　<span class="tk-mark">✦</span> 龜龜仍未推門　　<span class="tk-mark">✦</span> 門把磨損程度正在上升　　<span class="tk-mark">✦</span> 請勿催促龜龜　　<span class="tk-mark">✦</span> 何用作福問神仙　　</div></div>
 
 <div class="wrap page-deck">
 
   <header>
-    <span class="eyebrow"><span class="dot"></span>LIVE OBSERVATION</span>
+    <span class="eyebrow"><span class="dot"></span>✦ 星象觀測進行中</span>
     <h1 class="title">🐢 雲養龜觀察所</h1>
     <p class="subtitle">持續觀察一隻正在考慮推門的龜。</p>
     <div class="status-line">持續觀察中 · 觀察日 <b id="dayCount">計算中…</b> · 今日推門 <b>0</b> 次</div>
@@ -633,41 +659,39 @@
     </div>
   </div>
 
-  <!-- ======================= TAB: 首頁（觀測站主視野） ======================= -->
+  <!-- ======================= TAB: 首頁（沉浸式龜龜觀測場景） ======================= -->
   <section class="tabpanel active" id="tab-home">
 
-    <div class="obs-hero">
-      <!-- 龜龜目前在哪裡 -->
-      <div class="obs-hero-visual" id="sceneCard">
-        <div class="obs-eyebrow">⌖ LIVE FEED · 觀測目標：龜</div>
-        <div class="stage-wrap">
-          <img id="heroImg" src="assets/turtle-hero.jpg" alt="龜龜站在門前，門後透出星光" />
-        </div>
-        <div class="behavior-line">
-          <span class="tag mono" id="behaviorTag">🐢 目前行為：研究門把</span>
-        </div>
+    <!-- Hero：第一視覺主角，龜龜＋門的星空主視覺 -->
+    <div class="scene-hero" id="sceneCard">
+      <div class="stage-wrap">
+        <img id="heroImg" src="assets/turtle-hero.jpg" alt="龜龜站在門前，門後透出星光" />
       </div>
-
-      <!-- 即時觀測讀數（取代原本的 Dashboard 卡片網格） -->
-      <div class="obs-readout">
-        <div class="obs-eyebrow">OBS.LOG · 即時觀測讀數</div>
-        <div class="obs-readout-list" id="statsGrid">
-          <div class="obs-row obs-row-major"><span class="obs-k">心理放行</span><span class="obs-v" id="statMind">73%</span></div>
-          <div class="obs-row"><span class="obs-k">龜龜位置</span><span class="obs-v" id="statLocation">門前</span></div>
-          <div class="obs-row"><span class="obs-k">門</span><span class="obs-v" id="statDoor">未上鎖</span></div>
-          <div class="obs-row"><span class="obs-k">門把</span><span class="obs-v" id="statHandle">已觸摸</span></div>
-          <div class="obs-row"><span class="obs-k">訊息準備度</span><span class="obs-v" id="statMsg">68%</span></div>
-          <div class="obs-row"><span class="obs-k">實際行動度</span><span class="obs-v" id="statAction">54%</span></div>
-          <div class="obs-row"><span class="obs-k">今日退殼次數</span><span class="obs-v" id="statShell">3</span></div>
-          <div class="obs-row"><span class="obs-k">今日研究門把</span><span class="obs-v" id="statTouch">17 次</span></div>
-        </div>
-        <p class="obs-disclaimer">＊以上數字為人工輸入／模擬觀察資料，非真實測量結果。</p>
+      <div class="behavior-line">
+        <span class="tag mono" id="behaviorTag">🐢 目前行為：研究門把</span>
       </div>
     </div>
 
+    <!-- 核心狀態：只保留階段、心理放行、位置摘要，其餘數據降權放在後面 -->
+    <div class="scene-status">
+      <span class="scene-stage-badge">④ 準備行動</span>
+      <span class="scene-primary-label">心理放行</span>
+      <span class="scene-primary-value mono" id="statMind">73%</span>
+      <div class="scene-summary-line"><span id="statLocation">門前</span> · <span id="statDoor">未上鎖</span> · <span id="statHandle">已觸摸</span></div>
+    </div>
+
+    <!-- 其他觀察數據：降低權重，移到核心狀態之後 -->
+    <div class="scene-secondary">
+      <span>訊息準備度 <b id="statMsg">68%</b></span>
+      <span>實際行動度 <b id="statAction">54%</b></span>
+      <span>今日退殼次數 <b id="statShell">3</b></span>
+      <span>今日研究門把 <b id="statTouch">17 次</b></span>
+    </div>
+    <p class="obs-disclaimer" style="text-align:center;">＊以上數字為人工輸入／模擬觀察資料，非真實測量結果。</p>
+
     <!-- 龜龜今日語錄 -->
     <div class="obs-quote-block">
-      <div class="q-label">DAILY QUOTE · 龜龜今日語錄</div>
+      <div class="q-label">🔮 本日神諭 · 龜龜今日語錄</div>
       <blockquote id="quoteText">「我不是不推。」<br>「我只是還在研究。」</blockquote>
       <div class="obs-quote-meta" id="quoteMeta">— 龜龜，今日第 17 次摸門把後</div>
     </div>
