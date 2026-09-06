@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>雲養龜觀察所｜LIVE OBSERVATION</title>
+<title>雲養龜觀察所｜星象觀測檔案</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -47,9 +47,10 @@
   body{
     margin:0;
     background:
-      radial-gradient(900px 520px at 12% -10%, rgba(139,124,246,0.12) 0%, transparent 62%),
-      radial-gradient(700px 460px at 94% 2%, rgba(120,200,255,0.06) 0%, transparent 55%),
-      radial-gradient(1000px 700px at 50% 112%, rgba(139,124,246,0.11) 0%, transparent 62%),
+      radial-gradient(1000px 600px at 10% -12%, rgba(150,130,246,0.13) 0%, transparent 65%),
+      radial-gradient(800px 520px at 96% 4%, rgba(214,160,255,0.055) 0%, transparent 60%),
+      radial-gradient(760px 520px at 50% -6%, rgba(255,205,150,0.035) 0%, transparent 58%),
+      radial-gradient(1100px 760px at 50% 114%, rgba(150,130,246,0.11) 0%, transparent 64%),
       linear-gradient(180deg, #050310 0%, #0C0722 42%, #05030D 100%);
     background-attachment: fixed;
     color:var(--ink);
@@ -75,14 +76,19 @@
     background-size: 100% 100%;
     animation: starsDrift 70s linear infinite;
   }
-  /* 大型星軌幾何線：局部露出，非常淡，作為背景語言 */
+  /* 低調星盤刻度環：以 conic-gradient 產生 12 宮刻線，再用 radial mask 裁成細環，
+     取代原本單純的軌道圓圈，作為「占星盤」的背景語彙，非常淡、不搶視覺 */
   body::after{
     content:'';
     position:fixed; z-index:-1; pointer-events:none;
     top:-28vw; right:-24vw;
     width:62vw; height:62vw;
     border-radius:50%;
-    border:1px solid rgba(150,140,220,0.06);
+    background:
+      repeating-conic-gradient(rgba(203,174,115,0.16) 0deg 0.6deg, transparent 0.6deg 30deg),
+      radial-gradient(circle, transparent 0%, transparent 96%, rgba(150,140,220,0.05) 97%, transparent 98%);
+    -webkit-mask-image: radial-gradient(circle, transparent 63%, #000 64%, #000 67%, transparent 68%);
+            mask-image: radial-gradient(circle, transparent 63%, #000 64%, #000 67%, transparent 68%);
     animation: orbitBreathe 30s ease-in-out infinite;
   }
   @keyframes starsDrift{
@@ -91,8 +97,8 @@
     100%{ transform:translate(0,0); }
   }
   @keyframes orbitBreathe{
-    0%,100%{ opacity:0.6; }
-    50%{ opacity:1; }
+    0%,100%{ opacity:0.55; }
+    50%{ opacity:0.9; }
   }
   .mono{font-family:'Space Mono', monospace;}
   .serif{font-family:'Noto Serif TC', serif;}
@@ -147,11 +153,14 @@
       radial-gradient(circle at 50% 50%, rgba(139,124,246,0.05) 0%, transparent 65%);
   }
   header::after{
+    /* 月相：以 radial-gradient 遮罩裁出弦月形狀，取代原本的科技感虛線圓圈 */
     content:'';position:absolute;z-index:0;pointer-events:none;
-    top:6%;right:8%;
-    width:260px;height:260px;
+    top:8%;right:9%;
+    width:120px;height:120px;
     border-radius:50%;
-    border:1px dashed rgba(203,174,115,0.10);
+    background:rgba(203,174,115,0.20);
+    -webkit-mask-image: radial-gradient(circle at 64% 46%, transparent 54%, #000 55%);
+            mask-image: radial-gradient(circle at 64% 46%, transparent 54%, #000 55%);
   }
   header > *{position:relative;z-index:1;}
   .eyebrow{
@@ -161,7 +170,7 @@
     border:1px solid rgba(156,141,247,0.18);
     padding:5px 12px;border-radius:100px;
   }
-  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#7EEAC0;box-shadow:0 0 6px 0.5px rgba(126,234,192,.4);animation:pulse 2s infinite;}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--wood);box-shadow:0 0 7px 1px rgba(203,174,115,.45);animation:pulse 2s infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
   h1.title{
     font-family:'Noto Serif TC',serif;
@@ -541,25 +550,45 @@
   #tab-home{padding-top:4px;}
 
   #tab-home #heroImg{
-    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.6), 0 0 46px -14px rgba(203,174,115,0.22);
+    position:relative;z-index:1;
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.6), 0 0 70px -16px rgba(170,140,255,0.22), 0 0 40px -10px rgba(203,174,115,0.18);
   }
 
   .obs-hero{
+    position:relative;
     display:grid;
     grid-template-columns:1.35fr 1fr;
     gap:56px;
     align-items:start;
     margin-top:10px;
   }
-  .obs-hero-visual{position:relative;}
+  .obs-hero-visual{position:relative;z-index:1;}
+  /* 龜座：把龜龜畫成一個虛構的小星座，淡淡浮在整個 Hero 區塊後方（跨越圖片與讀數兩欄），
+     呼應「Q版龜龜 × 占星檔案」的反差感，取代原本的科技感準星。
+     刻意放在 .obs-hero（而非只在圖片容器內），這樣就算龜龜照片本身是不透明滿版，
+     星座圖仍會在欄間空隙與右側讀數區的留白處透出來。 */
+  .obs-hero::before{
+    content:'';
+    position:absolute;
+    inset:-40px -60px;
+    z-index:0;
+    pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 220'%3E%3Cg fill='none' stroke='rgba(203,196,255,0.4)' stroke-width='1'%3E%3Cline x1='160' y1='18' x2='105' y2='55'/%3E%3Cline x1='160' y1='18' x2='215' y2='55'/%3E%3Cline x1='105' y1='55' x2='215' y2='55'/%3E%3Cline x1='215' y1='55' x2='250' y2='110'/%3E%3Cline x1='250' y1='110' x2='215' y2='165'/%3E%3Cline x1='215' y1='165' x2='105' y2='165'/%3E%3Cline x1='105' y1='165' x2='70' y2='110'/%3E%3Cline x1='70' y1='110' x2='105' y2='55'/%3E%3Cline x1='105' y1='55' x2='55' y2='50'/%3E%3Cline x1='215' y1='55' x2='265' y2='50'/%3E%3Cline x1='105' y1='165' x2='55' y2='170'/%3E%3Cline x1='215' y1='165' x2='265' y2='170'/%3E%3Cline x1='215' y1='165' x2='160' y2='200'/%3E%3Cline x1='105' y1='165' x2='160' y2='200'/%3E%3C/g%3E%3Cg fill='rgba(236,235,250,0.75)'%3E%3Ccircle cx='160' cy='18' r='2.2'/%3E%3Ccircle cx='105' cy='55' r='2.4'/%3E%3Ccircle cx='215' cy='55' r='2.4'/%3E%3Ccircle cx='250' cy='110' r='2'/%3E%3Ccircle cx='215' cy='165' r='2.4'/%3E%3Ccircle cx='105' cy='165' r='2.4'/%3E%3Ccircle cx='70' cy='110' r='2'/%3E%3Ccircle cx='55' cy='50' r='1.8'/%3E%3Ccircle cx='265' cy='50' r='1.8'/%3E%3Ccircle cx='55' cy='170' r='1.8'/%3E%3Ccircle cx='265' cy='170' r='1.8'/%3E%3Ccircle cx='160' cy='200' r='1.8'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:82% 12%;
+    background-size:340px auto;
+    opacity:.6;
+  }
   .obs-eyebrow{
+    position:relative;z-index:1;
     display:flex;align-items:center;gap:8px;
     font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;
     color:var(--wood);opacity:.85;margin:0 0 14px;
   }
-  .obs-hero-visual .stage-wrap{padding:0;}
+  .obs-hero-visual .stage-wrap{position:relative;z-index:1;padding:0;}
+  .obs-hero-visual .behavior-line{position:relative;z-index:1;}
 
-  .obs-readout{padding-top:2px;}
+  .obs-readout{position:relative;z-index:1;padding-top:2px;}
   .obs-readout-list{border-top:1px solid var(--line-soft);margin-top:2px;}
   .obs-row{
     display:flex;justify-content:space-between;align-items:baseline;gap:14px;
@@ -572,7 +601,7 @@
   .obs-row-major .obs-v{
     font-family:'Space Mono',monospace;font-weight:700;
     font-size:52px;line-height:1;color:var(--wood);
-    text-shadow:0 0 24px rgba(203,174,115,0.35);
+    text-shadow:0 0 24px rgba(203,174,115,0.35), 0 0 50px rgba(170,140,255,0.14);
   }
   .obs-disclaimer{font-size:12px;color:var(--ink-soft);font-style:italic;margin:18px 0 0;}
 
@@ -618,7 +647,7 @@
 <div class="wrap page-deck">
 
   <header>
-    <span class="eyebrow"><span class="dot"></span>LIVE OBSERVATION</span>
+    <span class="eyebrow"><span class="dot"></span>✦ 星象觀測進行中</span>
     <h1 class="title">🐢 雲養龜觀察所</h1>
     <p class="subtitle">持續觀察一隻正在考慮推門的龜。</p>
     <div class="status-line">持續觀察中 · 觀察日 <b id="dayCount">計算中…</b> · 今日推門 <b>0</b> 次</div>
@@ -639,7 +668,7 @@
     <div class="obs-hero">
       <!-- 龜龜目前在哪裡 -->
       <div class="obs-hero-visual" id="sceneCard">
-        <div class="obs-eyebrow">⌖ LIVE FEED · 觀測目標：龜</div>
+        <div class="obs-eyebrow">✦ 星圖顯影 · 命運場景</div>
         <div class="stage-wrap">
           <img id="heroImg" src="assets/turtle-hero.jpg" alt="龜龜站在門前，門後透出星光" />
         </div>
@@ -650,7 +679,7 @@
 
       <!-- 即時觀測讀數（取代原本的 Dashboard 卡片網格） -->
       <div class="obs-readout">
-        <div class="obs-eyebrow">OBS.LOG · 即時觀測讀數</div>
+        <div class="obs-eyebrow">☾ 星象紀錄 · 命盤判讀</div>
         <div class="obs-readout-list" id="statsGrid">
           <div class="obs-row obs-row-major"><span class="obs-k">心理放行</span><span class="obs-v" id="statMind">73%</span></div>
           <div class="obs-row"><span class="obs-k">龜龜位置</span><span class="obs-v" id="statLocation">門前</span></div>
@@ -667,7 +696,7 @@
 
     <!-- 龜龜今日語錄 -->
     <div class="obs-quote-block">
-      <div class="q-label">DAILY QUOTE · 龜龜今日語錄</div>
+      <div class="q-label">🔮 本日神諭 · 龜龜今日語錄</div>
       <blockquote id="quoteText">「我不是不推。」<br>「我只是還在研究。」</blockquote>
       <div class="obs-quote-meta" id="quoteMeta">— 龜龜，今日第 17 次摸門把後</div>
     </div>
