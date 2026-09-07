@@ -1,7 +1,7 @@
 @echo off
 cd /d "%~dp0"
 echo ===== git pull =====
-git pull
+git pull --no-edit
 echo ===== git add =====
 git add .
 echo ===== git commit =====
