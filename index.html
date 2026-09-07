@@ -603,11 +603,22 @@
     text-shadow:0 1px 5px rgba(0,0,0,0.65);
   }
   .obs-quote-meta{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);text-shadow:0 1px 4px rgba(0,0,0,0.6);}
+  .obs-quote-divider{margin:22px 0 20px;border-top:1px solid rgba(196,188,240,0.12);}
 
-  /* RECENT SIGNAL／最近觀測：直接沿用 02「觀察紀錄」頁的時間軸視覺語言（.timeline/.tl-entry），
-     不加背景面板、不做成 Dashboard 卡片，維持首頁沉浸式場景的簡潔感。
+  /* RECENT SIGNAL／最近觀測：沿用 02「觀察紀錄」頁的時間軸視覺語言（.timeline/.tl-entry），
+     整個區塊（標題＋時間軸＋查看全部）共用「一個」低調的深藍黑半透明 Reading Panel，
+     不逐筆做 Card、不用純黑、不做強陰影或 Glow，星空仍可微微透出。
      合併 observations（真實觀察）與 mix_observations（MIX 推測）依時間排序取最新 3 筆。 */
-  .recent-log{max-width:540px;margin:72px auto 0;}
+  .recent-log{
+    max-width:540px;margin:72px auto 0;
+    padding:26px 26px 22px;
+    background:rgba(8,7,18,0.5);
+    backdrop-filter: blur(6px) saturate(115%);
+    -webkit-backdrop-filter: blur(6px) saturate(115%);
+    border:1px solid rgba(255,255,255,0.045);
+    border-radius:14px;
+    box-shadow:0 6px 16px -16px rgba(0,0,0,0.3);
+  }
   .recent-log-label{
     display:block;margin:0 0 20px;text-align:left;
     font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:.12em;
@@ -635,22 +646,72 @@
   }
   .recent-log-more:hover{color:var(--ink);border-bottom-color:rgba(255,255,255,0.3);}
 
-  /* 操作按鈕：降低 CTA 感，改成精緻的 ghost / text action，不做大型膠囊按鈕 */
-  .obs-controls{display:flex;flex-wrap:wrap;gap:32px;justify-content:center;margin-top:34px;}
+  /* 觀測所即時回報：把原本「按鈕＋一行系統提示」擴充成一個小型、有趣的即時回報區塊，
+     內容全部沿用既有真實／模擬資料（目前行為、今日研究門把次數、系統提示文字），不新增假資料，
+     維持「一本正經觀察一隻不推門的龜」的幽默感。輕量半透明面板，不做 Dashboard 分格卡片。 */
+  .obs-report{
+    max-width:540px;margin:56px auto 0;
+    padding:24px 26px 26px;
+    background:rgba(8,7,18,0.46);
+    backdrop-filter: blur(6px) saturate(115%);
+    -webkit-backdrop-filter: blur(6px) saturate(115%);
+    border:1px solid rgba(255,255,255,0.045);
+    border-radius:14px;
+    box-shadow:0 6px 16px -16px rgba(0,0,0,0.3);
+  }
+  .obs-report-label{
+    display:block;margin:0 0 4px;text-align:left;
+    font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:.12em;
+    color:var(--wood);text-shadow:0 1px 4px rgba(0,0,0,0.6);
+  }
+  .obs-report-caption{
+    margin:0 0 16px;font-size:12.5px;color:var(--ink-soft);
+    text-shadow:0 1px 4px rgba(0,0,0,0.55);
+  }
+  .obs-report-list{margin:0;}
+  .obs-report-row{
+    display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+    padding:10px 0;border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .obs-report-row:first-child{border-top:none;padding-top:0;}
+  .obs-report-lb{font-size:13px;color:var(--ink-soft);text-shadow:0 1px 4px rgba(0,0,0,0.55);white-space:nowrap;}
+  .obs-report-v{font-family:'Space Mono',monospace;font-size:13.5px;color:var(--ink);text-align:right;text-shadow:0 1px 4px rgba(0,0,0,0.6);}
+  .obs-report-row-notice{align-items:flex-start;}
+  .obs-report-row-notice .obs-report-v{
+    font-family:'Noto Sans TC',sans-serif;font-weight:700;color:#E7C98F;text-align:right;max-width:62%;
+  }
+  .obs-report .obs-controls{margin-top:26px;}
+
+  /* 操作按鈕：整合進本日神諭底部的明確互動區——低調深紫半透明底＋細邊框，
+     讓人一看就知道可以按，但不做大型 CTA；hover 有暖金／紫色光感與輕微位移回饋 */
+  .obs-controls{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:0;}
   .obs-controls .act{
-    padding:6px 2px;border-radius:2px;box-shadow:none;
+    padding:10px 22px;border-radius:9px;
     font-size:13.5px;font-weight:700;letter-spacing:.03em;
+    background:rgba(94,74,148,0.16);
+    border:1px solid rgba(186,164,232,0.22);
+    backdrop-filter: blur(4px) saturate(120%);
+    -webkit-backdrop-filter: blur(4px) saturate(120%);
+    box-shadow:none;
+    transition:background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .15s ease, color .2s ease;
   }
-  .obs-btn-primary{
-    background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;
-    color:var(--wood);border:none;border-bottom:1px solid rgba(203,174,115,0.4);
+  .obs-btn-primary{color:var(--wood);}
+  .obs-btn-primary:hover{
+    background:rgba(203,174,115,0.14);
+    border-color:rgba(203,174,115,0.5);
+    box-shadow:0 4px 16px -8px rgba(203,174,115,0.4);
+    transform:translateY(-1px);
+    color:#F0DBA0;
   }
-  .obs-btn-primary:hover{background:transparent;color:#E4CD98;border-bottom-color:rgba(203,174,115,0.75);}
-  .obs-btn-ghost{
-    background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;
-    color:var(--ink-soft);border:none;border-bottom:1px solid rgba(255,255,255,0.14);
+  .obs-btn-ghost{color:var(--ink-soft);}
+  .obs-btn-ghost:hover{
+    background:rgba(150,124,224,0.16);
+    border-color:rgba(186,164,232,0.45);
+    box-shadow:0 4px 16px -8px rgba(150,124,224,0.4);
+    transform:translateY(-1px);
+    color:var(--ink);
   }
-  .obs-btn-ghost:hover{background:transparent;color:var(--ink);border-bottom-color:rgba(255,255,255,0.3);}
+  .obs-controls .act:active{transform:translateY(0);}
 
   @media (max-width:640px){
     .stats-grid{grid-template-columns:repeat(2,1fr);}
@@ -662,6 +723,9 @@
     .tabbtn .n{font-size:9px;}
     .scene-primary-value{font-size:44px;}
     .obs-quote-block{margin-top:56px;padding:20px 18px 18px 18px;}
+    .obs-report{margin-top:44px;padding:20px 18px 20px;}
+    .obs-report-row{flex-wrap:wrap;gap:4px;}
+    .obs-report-row-notice .obs-report-v{max-width:100%;text-align:left;}
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -724,11 +788,20 @@
       <p class="obs-disclaimer" style="text-align:center;">＊以上數字為人工輸入／模擬觀察資料，非真實測量結果。</p>
     </div>
 
-    <!-- 龜龜今日語錄 -->
+    <!-- 龜龜今日語錄＋互動操作區：查看龜龜最新狀態／催一下龜龜，功能與 id 完全不變，
+         整合進本日神諭區塊底部，用細分隔線與語錄區隔 -->
     <div class="obs-quote-block">
       <div class="q-label">🔮 本日神諭 · 龜龜今日語錄</div>
       <blockquote id="quoteText">「我不是不推。」<br>「我只是還在研究。」</blockquote>
       <div class="obs-quote-meta" id="quoteMeta">— 龜龜，今日第 17 次摸門把後</div>
+
+      <div class="obs-quote-divider"></div>
+
+      <div class="controls obs-controls">
+        <button class="act obs-btn-primary" id="checkBtn">查看龜龜最新狀態</button>
+        <button class="act obs-btn-ghost" id="pushBtn">催一下龜龜</button>
+      </div>
+      <div id="toast" class="mono"></div>
     </div>
 
     <!-- RECENT SIGNAL／最近觀測：合併真實觀察（observations）與 MIX 推測（mix_observations），
@@ -738,12 +811,6 @@
       <div class="timeline recent-log-list" id="recentLog"></div>
       <button class="recent-log-more" id="recentLogMore" type="button">查看全部觀察紀錄 →</button>
     </div>
-
-    <div class="controls obs-controls">
-      <button class="act obs-btn-primary" id="checkBtn">查看龜龜最新狀態</button>
-      <button class="act obs-btn-ghost" id="pushBtn">催一下龜龜</button>
-    </div>
-    <div id="toast" class="mono"></div>
 
   </section>
 
@@ -1234,6 +1301,7 @@
     document.getElementById('statShell').textContent = retreatToday + ' 次';
     document.getElementById('statTouch').textContent = touchesToday + ' 次';
     document.getElementById('behTouch').textContent = touchesToday + ' 次';
+    if(typeof syncObsReport === 'function') syncObsReport();
   }
 
   async function loadLogEntries(){
@@ -1548,8 +1616,24 @@
     const w = warnings[Math.floor(Math.random()*warnings.length)];
     const el = document.getElementById('warnText');
     el.parentElement.style.opacity = 0;
-    setTimeout(()=>{ el.textContent = w; el.parentElement.style.opacity = 1; }, 250);
+    setTimeout(()=>{ el.textContent = w; el.parentElement.style.opacity = 1; syncObsReport(); }, 250);
     if(logIt) pushWarnLog(w);
+  }
+
+  // HOME「觀測所即時回報」：從既有元素（behaviorTag／今日研究門把統計／系統提示）鏡射最新內容，
+  // 不建立新的資料來源，單純把已存在的真實／模擬資料同步顯示到回報區塊。
+  function syncObsReport(){
+    const btEl = document.getElementById('behaviorTag');
+    const rb = document.getElementById('reportBehavior');
+    if(btEl && rb) rb.textContent = btEl.textContent.replace(/^🐢\s*目前行為[:：]\s*/, '');
+
+    const touchEl = document.getElementById('behTouch') || document.getElementById('statTouch');
+    const rt = document.getElementById('reportTouch');
+    if(touchEl && rt) rt.textContent = touchEl.textContent;
+
+    const warnEl = document.getElementById('warnText');
+    const rn = document.getElementById('reportNotice');
+    if(warnEl && rn) rn.textContent = warnEl.textContent;
   }
 
   // rotate warning banner ambiently
@@ -1581,6 +1665,7 @@
     document.getElementById('behaviorTag').textContent = behaviorTags[Math.floor(Math.random()*behaviorTags.length)];
     randomQuote();
     randomWarning(false);
+    syncObsReport();
 
     const msgs = [
       "已更新最新觀測結果。龜龜仍在研究中。",
@@ -1600,12 +1685,14 @@
     setProgress(progress - 1, 'back');
     document.getElementById('behaviorTag').textContent = "🐢 目前行為：看了你一眼，然後縮回殼裡";
     setToast("「龜龜看了你一眼。」「然後縮回殼裡。」進度 -1%。");
+    syncObsReport();
   });
 
   // ---------- init ----------
   updateStageBlock();
   pushWarnLog("龜龜正在思考。");
   randomWarning(false);
+  syncObsReport();
 </script>
 </body>
 </html>
