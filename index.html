@@ -193,6 +193,41 @@
   .tabpanel.active{display:block;}
   @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
+  /* ---------- 01 觀察紀錄：分頁內快速導覽（低調、非卡片、不 sticky） ----------
+     延續主 Tab 的深午夜藍紫底＋細邊框語言，但明顯更輕量；hover／按壓時轉暖金，
+     和主導覽的 active 金色呼應。桌機一列排開；手機不換行，改用容器內橫向捲動。 */
+  .log-quicknav{
+    display:flex;flex-wrap:nowrap;gap:8px;
+    margin:22px 0 0;padding:2px 1px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .log-quicknav::-webkit-scrollbar{display:none;}
+  .log-quicknav-link{
+    flex:0 0 auto;white-space:nowrap;
+    font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.03em;
+    color:var(--ink-soft);
+    background:rgba(94,74,148,0.14);
+    border:1px solid rgba(186,164,232,0.20);
+    border-radius:100px;
+    padding:8px 16px;cursor:pointer;
+    transition:background .2s ease, border-color .2s ease, color .2s ease;
+  }
+  .log-quicknav-link:hover{
+    color:var(--ink);
+    background:rgba(150,124,224,0.16);
+    border-color:rgba(186,164,232,0.4);
+  }
+  .log-quicknav-link:active{
+    color:var(--wood);
+    background:rgba(203,174,115,0.14);
+    border-color:rgba(203,174,115,0.5);
+  }
+  .log-quicknav-link:focus-visible{outline:2px solid var(--wood);outline-offset:2px;}
+
+  /* 讓區內導覽跳轉時，標題不被上方 sticky 主導覽（.tabbar-wrap）遮住 */
+  .log-scroll-target{scroll-margin-top:84px;}
+
   /* ---------- section label ---------- */
   .section-label{
     display:flex;align-items:center;gap:10px;margin:58px 0 20px;flex-wrap:wrap;
@@ -412,6 +447,50 @@
     font-size:13.5px;color:var(--wood-deep);
   }
 
+  /* ---------- MIX 表格：手機版改為直式紀錄卡（僅 ≤640px，桌機版外觀不變） ----------
+     每個 tr 變成一張半透明深藍黑閱讀卡（沿用 .card 同一套視覺語言，但不強烈 glow）；
+     thead 隱藏，每個 td 用 ::before + data-label 顯示欄位名稱；不做橫向捲動。 */
+  @media (max-width:640px){
+    .mix-table-wrap{overflow-x:visible;}
+    .mix-table{min-width:0;table-layout:auto;}
+    .mix-table thead{
+      position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+      overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+    }
+    .mix-table, .mix-table tbody, .mix-table tr, .mix-table td{display:block;width:100%;}
+    .mix-table tr{
+      background:rgba(8,7,18,0.46);
+      border:1px solid rgba(255,255,255,0.05);
+      border-radius:12px;
+      padding:14px 16px;
+      margin-bottom:14px;
+      box-shadow:0 6px 16px -16px rgba(0,0,0,0.3);
+    }
+    .mix-table tr:last-child{margin-bottom:0;}
+    .mix-table tbody td{
+      padding:8px 0;border-bottom:1px dashed var(--line-soft);
+      white-space:normal;word-break:break-word;overflow-wrap:anywhere;
+    }
+    .mix-table tbody td:first-child{padding-top:0;}
+    .mix-table tbody td:last-child{padding-bottom:0;border-bottom:none;}
+    .mix-table td.mix-time{white-space:normal;}
+    .mix-table td::before{
+      content:attr(data-label);
+      display:block;margin:0 0 4px;
+      font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;
+      color:var(--wood);opacity:.9;
+    }
+    .mix-stage-badge{
+      display:inline-block;
+      font-family:'Noto Sans TC',sans-serif;font-weight:700;font-size:12.5px;
+      color:var(--wood-deep);
+      background:rgba(203,174,115,0.12);
+      border:1px solid rgba(203,174,115,0.35);
+      border-radius:100px;
+      padding:4px 12px;
+    }
+  }
+
   /* ---------- modal ---------- */
   .modal-overlay{
     display:none;position:fixed;inset:0;z-index:100;
@@ -601,6 +680,10 @@
     font-family:'Noto Serif TC',serif;font-weight:700;
     font-size:clamp(19px,3vw,24px);margin:12px 0 12px;line-height:1.6;color:var(--ink);
     text-shadow:0 1px 5px rgba(0,0,0,0.65);
+    /* 預留兩行語錄的高度，避免一行／兩行切換時署名、分隔線、按鈕跟著上下跳動；
+       用 em（= line-height × font-size）而非 px，讓 clamp() 響應式字級縮放時仍準確對齊兩行，
+       超過兩行時仍可自然增高，不做截斷、不鎖死整張卡片 */
+    min-height:calc(1.6em * 2);
   }
   .obs-quote-meta{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);text-shadow:0 1px 4px rgba(0,0,0,0.6);}
   .obs-quote-divider{margin:22px 0 20px;border-top:1px solid rgba(196,188,240,0.12);}
@@ -876,7 +959,14 @@
   <!-- ======================= TAB2: 觀察紀錄 ======================= -->
   <section class="tabpanel" id="tab-log">
 
-    <div class="section-label" style="margin-top:22px;"><span class="num mono">01 · A</span><h2>📝 新增真實觀察紀錄</h2><div class="rule"></div></div>
+    <!-- 01 分頁內快速導覽：純畫面捲動用，不是網址 hash 路由，不影響 #home/#log/#progress/#warn 的分頁切換邏輯 -->
+    <nav class="log-quicknav" aria-label="觀察紀錄分頁內導覽">
+      <button type="button" class="log-quicknav-link" data-target="logSecReal">真實觀察資料</button>
+      <button type="button" class="log-quicknav-link" data-target="logSecHistory">龜龜觀察紀錄</button>
+      <button type="button" class="log-quicknav-link" data-target="logSecMix">MIX 龜龜觀測站</button>
+    </nav>
+
+    <div class="section-label log-scroll-target" id="logSecReal" style="margin-top:22px;"><span class="num mono">01 · A</span><h2>📝 新增真實觀察紀錄</h2><div class="rule"></div></div>
     <div class="card" style="padding:22px 24px;">
       <div class="log-form">
         <label class="log-label mono">今天觀察到什麼？</label>
@@ -914,12 +1004,12 @@
       </div>
     </div>
 
-    <div class="section-label"><span class="num mono">01 · B</span><h2>📋 龜龜觀察紀錄</h2><div class="rule"></div></div>
+    <div class="section-label log-scroll-target" id="logSecHistory"><span class="num mono">01 · B</span><h2>📋 龜龜觀察紀錄</h2><div class="rule"></div></div>
     <div class="card" style="padding:24px 24px 4px;">
       <div class="timeline" id="timeline"></div>
     </div>
 
-    <div class="section-label">
+    <div class="section-label log-scroll-target" id="logSecMix">
       <span class="num mono">01 · C</span><h2>🔮 MIX 龜龜觀測站</h2><div class="rule"></div>
       <button class="act btn-primary mix-add-btn" id="mixAddBtn">＋ 新增紀錄</button>
     </div>
@@ -1422,11 +1512,11 @@
     empty.style.display = 'none';
     body.innerHTML = mixEntries.map(e => `
       <tr>
-        <td class="mix-time">${formatMixTime(e.observed_at)}</td>
-        <td>${escapeHtml(e.question)}</td>
-        <td>${escapeHtml(e.mix_components)}</td>
-        <td>${escapeHtml(e.conclusion)}</td>
-        <td class="mix-stage">${escapeHtml(e.stage)}</td>
+        <td class="mix-time" data-label="日期時間">${formatMixTime(e.observed_at)}</td>
+        <td data-label="觀測問題">${escapeHtml(e.question)}</td>
+        <td data-label="MIX 組成">${escapeHtml(e.mix_components)}</td>
+        <td data-label="MIX 交集結論">${escapeHtml(e.conclusion)}</td>
+        <td class="mix-stage" data-label="進度階段"><span class="mix-stage-badge">${escapeHtml(e.stage)}</span></td>
       </tr>
     `).join('');
   }
@@ -1516,20 +1606,54 @@
 
   loadMixEntries();
 
-  // ---------- tabs ----------
+  // ---------- tabs（含網址 hash 狀態：#home／#log／#progress／#warn） ----------
   const tabBtns = document.querySelectorAll('.tabbtn');
   const panels = document.querySelectorAll('.tabpanel');
+  const TAB_NAMES = Array.from(tabBtns).map(b=>b.dataset.tab); // ['home','log','progress','warn']
+
+  // 純 DOM 切換：切分頁 active 狀態＋（可選）捲動到頂部。
+  // .tabpanel 的 fadein 動畫是靠 display:none → block 觸發，沿用同一套 class 切換邏輯即可保留淡入效果。
+  function activateTab(tabName, opts){
+    const scroll = !opts || opts.scroll !== false;
+    const targetBtn = document.querySelector(`.tabbtn[data-tab="${tabName}"]`);
+    const targetPanel = document.getElementById('tab-'+tabName);
+    if(!targetBtn || !targetPanel) return false;
+    tabBtns.forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    panels.forEach(p=>p.classList.remove('active'));
+    targetBtn.classList.add('active'); targetBtn.setAttribute('aria-selected','true');
+    targetPanel.classList.add('active');
+    if(scroll) window.scrollTo({top:0, behavior:'smooth'});
+    return true;
+  }
+
+  // 目前網址 hash 對應的分頁；hash 不存在或不是合法分頁名稱時，回傳 'home'
+  function tabFromHash(){
+    const h = location.hash.replace('#','');
+    return TAB_NAMES.includes(h) ? h : 'home';
+  }
+
   tabBtns.forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      tabBtns.forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
-      panels.forEach(p=>p.classList.remove('active'));
-      btn.classList.add('active'); btn.setAttribute('aria-selected','true');
-      document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
-      window.scrollTo({top:0, behavior:'smooth'});
+      const tab = btn.dataset.tab;
+      if(location.hash === '#'+tab){
+        // 目前已在這個分頁：hash 不會變、不會觸發 hashchange，直接切換（維持原本「重複點擊也捲動到頂部」的行為）
+        activateTab(tab);
+      } else {
+        location.hash = tab; // 觸發 hashchange，由下方監聽統一處理切換＋捲動
+      }
     });
   });
 
-  // HOME「查看全部觀察紀錄 →」：切換到 01 觀察紀錄 分頁（重用既有 Tab 切換邏輯）
+  // 瀏覽器上一頁／下一頁、或手動修改網址 hash 時同步切換分頁
+  window.addEventListener('hashchange', ()=>{
+    activateTab(tabFromHash());
+  });
+
+  // 頁面初次載入／重新整理：依目前 hash 開啟對應分頁；無效或不存在則顯示首頁。
+  // 一開始就在頁面頂部，不需要捲動動畫。
+  activateTab(tabFromHash(), {scroll:false});
+
+  // HOME「查看全部觀察紀錄 →」：切換到 01 觀察紀錄 分頁（重用既有 Tab 切換邏輯，會一併更新網址為 #log）
   const recentLogMoreBtn = document.getElementById('recentLogMore');
   if(recentLogMoreBtn){
     recentLogMoreBtn.addEventListener('click', ()=>{
@@ -1537,6 +1661,15 @@
       if(logTabBtn) logTabBtn.click();
     });
   }
+
+  // 01 觀察紀錄分頁內快速導覽：純畫面平滑捲動（scroll-margin-top 已處理 sticky 主導覽的遮擋），
+  // 不會改動網址 hash，跟 #home/#log/#progress/#warn 的分頁路由完全獨立
+  document.querySelectorAll('.log-quicknav-link').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const target = document.getElementById(btn.dataset.target);
+      if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
 
   // ---------- build stage track ----------
   const track = document.getElementById('stageTrack');
