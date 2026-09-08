@@ -193,6 +193,47 @@
   .tabpanel.active{display:block;}
   @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
+  /* ---------- 回到頂端：全站共用，固定右下角 ----------
+     捲動超過門檻才淡入／接近頂端時隱藏；深午夜藍紫半透明底＋細暖金邊框，不做強烈 glow。 */
+  .back-to-top{
+    position:fixed;
+    right:calc(22px + env(safe-area-inset-right, 0px));
+    bottom:calc(22px + env(safe-area-inset-bottom, 0px));
+    width:46px;height:46px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;
+    background:rgba(18,16,36,0.62);
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    border:1px solid rgba(203,174,115,0.32);
+    color:var(--wood);
+    font-size:19px;line-height:1;font-weight:700;
+    cursor:pointer;
+    box-shadow:0 6px 16px -10px rgba(0,0,0,0.5);
+    opacity:0;visibility:hidden;pointer-events:none;
+    transform:translateY(8px);
+    transition:opacity .25s ease, transform .25s ease, background .2s ease, border-color .2s ease;
+    z-index:40; /* 高於一般內容與 sticky 主導覽（30），低於彈窗遮罩（100）：彈窗開啟時不會浮在上面 */
+  }
+  .back-to-top.is-visible{
+    opacity:1;visibility:visible;pointer-events:auto;
+    transform:translateY(0);
+  }
+  .back-to-top:hover{
+    background:rgba(203,174,115,0.14);
+    border-color:rgba(203,174,115,0.55);
+  }
+  .back-to-top:focus-visible{
+    outline:2px solid var(--wood);outline-offset:2px;
+  }
+  @media (max-width:640px){
+    .back-to-top{
+      width:40px;height:40px;font-size:16px;
+      right:calc(14px + env(safe-area-inset-right, 0px));
+      bottom:calc(14px + env(safe-area-inset-bottom, 0px));
+    }
+  }
+
   /* ---------- 01 觀察紀錄：分頁內快速導覽（低調、非卡片、不 sticky） ----------
      延續主 Tab 的深午夜藍紫底＋細邊框語言，但明顯更輕量；hover／按壓時轉暖金，
      和主導覽的 active 金色呼應。桌機一列排開；手機不換行，改用容器內橫向捲動。 */
@@ -447,6 +488,25 @@
     font-size:13.5px;color:var(--wood-deep);
   }
 
+  /* ---------- MIX 分頁控制（桌機／手機共用；只有超過 1 頁才顯示，由 JS 切換 display） ---------- */
+  .mix-pagination{
+    display:flex;align-items:center;justify-content:center;gap:14px;
+    margin-top:18px;
+  }
+  .mix-page-btn{
+    font-family:'Noto Sans TC',sans-serif;font-weight:700;font-size:13px;
+    padding:8px 16px;border-radius:100px;
+    background:var(--paper);border:1px solid var(--line);color:var(--ink);
+    cursor:pointer;
+    transition:background .2s ease, border-color .2s ease, color .2s ease, opacity .2s ease;
+  }
+  .mix-page-btn:hover:not(:disabled){
+    background:var(--paper-2);border-color:rgba(203,174,115,0.35);
+  }
+  .mix-page-btn:focus-visible{outline:2px solid var(--wood);outline-offset:2px;}
+  .mix-page-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .mix-page-info{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);white-space:nowrap;}
+
   /* ---------- MIX 表格：手機版改為直式紀錄卡（僅 ≤640px，桌機版外觀不變） ----------
      每個 tr 變成一張半透明深藍黑閱讀卡（沿用 .card 同一套視覺語言，但不強烈 glow）；
      thead 隱藏，每個 td 用 ::before + data-label 顯示欄位名稱；不做橫向捲動。 */
@@ -489,6 +549,9 @@
       border-radius:100px;
       padding:4px 12px;
     }
+    .mix-pagination{gap:10px;}
+    .mix-page-btn{padding:7px 12px;font-size:12.5px;}
+    .mix-page-info{font-size:11.5px;}
   }
 
   /* ---------- modal ---------- */
@@ -1036,6 +1099,14 @@
         </table>
         <p class="mix-empty" id="mixEmpty">尚無 MIX 觀測紀錄，點右上角「＋ 新增紀錄」開始記錄。</p>
       </div>
+
+      <!-- MIX 分頁控制：每頁固定 10 筆，server-side limit/offset，只有超過 1 頁才顯示 -->
+      <div class="mix-pagination" id="mixPagination">
+        <button type="button" class="mix-page-btn" id="mixPrevBtn">← 上一頁</button>
+        <span class="mix-page-info mono" id="mixPageInfo">第 1 / 1 頁</span>
+        <button type="button" class="mix-page-btn" id="mixNextBtn">下一頁 →</button>
+      </div>
+
       <p class="log-status mono" id="mixStatus">正在連接資料庫…</p>
       <div class="mix-warn">⚠️ <span><b>MIX 系統提醒：</b>請勿每三小時詢問一次同一隻龜。</span></div>
     </div>
@@ -1112,6 +1183,9 @@
   </section>
 
 </div>
+
+<!-- 回到頂端：全站共用（不限 01 分頁），固定右下角，捲動超過門檻才淡入 -->
+<button type="button" id="backToTop" class="back-to-top" aria-label="回到頁面頂端" title="回到頂端">↑</button>
 
 <script>
   // ---------- data ----------
@@ -1222,7 +1296,8 @@
       text: e.text
     }));
 
-    const mixItems = (typeof mixEntries !== 'undefined' ? mixEntries : []).map(e => ({
+    // 用 mixLatestEntries（永遠是 MIX 第 1 頁＝最新資料），不受表格切頁影響
+    const mixItems = (typeof mixLatestEntries !== 'undefined' ? mixLatestEntries : []).map(e => ({
       kind: 'mix',
       ts: e.observed_at ? new Date(e.observed_at).getTime() : 0,
       time: formatMixTime(e.observed_at),
@@ -1303,8 +1378,9 @@
     // 今日退殼次數：文字含 退／縮／躲／逃
     const retreatToday = todays.filter(e => /退|縮|躲|逃/.test(e.text)).length;
 
-    // 最新一筆 MIX（mixEntries 已依 observed_at desc 排序，index 0 為最新）
-    const latestMix = (typeof mixEntries !== 'undefined' && mixEntries.length > 0) ? mixEntries[0] : null;
+    // 最新一筆 MIX：用 mixLatestEntries（永遠對應 MIX 第 1 頁＝最新資料，已依 observed_at desc 排序，
+    // index 0 為最新），不會因為表格切到第 2 頁以後而誤用舊資料
+    const latestMix = (typeof mixLatestEntries !== 'undefined' && mixLatestEntries.length > 0) ? mixLatestEntries[0] : null;
     const stageIdx = latestMix ? stageIndexOf(latestMix.stage) : null;
 
     // 🐢 龜龜位置：跟著最新 MIX stage
@@ -1334,9 +1410,9 @@
 
     // 🧠 心理放行：MIX stage 對應基準值，再依最新 3 筆 MIX 的用詞加分／扣分
     let mindPercent = stageIdx !== null ? MIND_BASELINE_BY_STAGE[stageIdx] : progress;
-    if(typeof mixEntries !== 'undefined' && mixEntries.length > 0){
+    if(typeof mixLatestEntries !== 'undefined' && mixLatestEntries.length > 0){
       let mindAdjust = 0;
-      mixEntries.slice(0, 3).forEach(m => {
+      mixLatestEntries.slice(0, 3).forEach(m => {
         const t = `${m.conclusion || ''} ${m.question || ''}`;
         if(MIND_DECREASE_KW.test(t)) mindAdjust -= 8;
         if(MIND_INCREASE_KW.test(t)) mindAdjust += 8;
@@ -1484,9 +1560,18 @@
   document.getElementById('addLogBtn').addEventListener('click', addLogEntry);
   loadLogEntries();
 
-  // ---------- MIX 龜龜觀測站（獨立的 Supabase 資料表：mix_observations） ----------
+  // ---------- MIX 龜龜觀測站（獨立的 Supabase 資料表：mix_observations，server-side 分頁） ----------
   const MIX_TABLE = 'mix_observations';
-  let mixEntries = [];
+  const MIX_PAGE_SIZE = 10;
+  // mixLatestEntries：永遠對應「第 1 頁＝最新資料」，給首頁 RECENT SIGNAL／updateDashboardStats() 用，
+  // 不會因為使用者把表格切到第 2 頁以後而被覆蓋。
+  // mixPageEntries：目前表格頁面實際顯示的那一頁資料，會隨切頁改變。
+  let mixLatestEntries = [];
+  let mixPageEntries = [];
+  let mixCurrentPage = 1;
+  let mixTotalCount = 0;
+  let mixTotalPages = 1;
+  let mixPageLoading = false;
 
   function formatMixTime(iso){
     if(!iso) return '';
@@ -1503,14 +1588,14 @@
     const body = document.getElementById('mixTableBody');
     const empty = document.getElementById('mixEmpty');
     const table = document.getElementById('mixTable');
-    if(mixEntries.length === 0){
+    if(mixPageEntries.length === 0){
       table.style.display = 'none';
       empty.style.display = 'block';
       return;
     }
     table.style.display = '';
     empty.style.display = 'none';
-    body.innerHTML = mixEntries.map(e => `
+    body.innerHTML = mixPageEntries.map(e => `
       <tr>
         <td class="mix-time" data-label="日期時間">${formatMixTime(e.observed_at)}</td>
         <td data-label="觀測問題">${escapeHtml(e.question)}</td>
@@ -1521,24 +1606,83 @@
     `).join('');
   }
 
-  async function loadMixEntries(){
+  // 分頁列文字／按鈕狀態；只有超過 1 頁才顯示整組控制項
+  function renderMixPagination(){
+    const wrap = document.getElementById('mixPagination');
+    const info = document.getElementById('mixPageInfo');
+    const prevBtn = document.getElementById('mixPrevBtn');
+    const nextBtn = document.getElementById('mixNextBtn');
+    if(!wrap || !info || !prevBtn || !nextBtn) return;
+    if(mixTotalPages <= 1){
+      wrap.style.display = 'none';
+      return;
+    }
+    wrap.style.display = 'flex';
+    info.textContent = `第 ${mixCurrentPage} / ${mixTotalPages} 頁`;
+    prevBtn.disabled = mixPageLoading || mixCurrentPage <= 1;
+    nextBtn.disabled = mixPageLoading || mixCurrentPage >= mixTotalPages;
+  }
+
+  // 真正的 Supabase server-side pagination：limit/offset 取目前頁資料，
+  // Prefer: count=exact 讓回應帶 Content-Range，從中解析總筆數／總頁數。
+  async function loadMixPage(page, opts){
+    if(mixPageLoading) return;
+    mixPageLoading = true;
+    renderMixPagination(); // 立刻停用上一頁／下一頁，避免載入期間被重複點擊
+
     const statusEl = document.getElementById('mixStatus');
     statusEl.textContent = '正在連接資料庫…';
+    const offset = (page - 1) * MIX_PAGE_SIZE;
+    let succeeded = false;
+
     try{
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/${MIX_TABLE}?select=*&order=observed_at.desc&limit=50`,
-        { headers: SUPABASE_HEADERS }
+        `${SUPABASE_URL}/rest/v1/${MIX_TABLE}?select=*&order=observed_at.desc&limit=${MIX_PAGE_SIZE}&offset=${offset}`,
+        { headers: { ...SUPABASE_HEADERS, Prefer: 'count=exact' } }
       );
       if(!res.ok) throw new Error('load failed: ' + res.status);
-      mixEntries = await res.json();
-      statusEl.textContent = `已連接資料庫，共 ${mixEntries.length} 筆 MIX 觀測紀錄。`;
+      const data = await res.json();
+
+      // Content-Range 格式如「0-9/23」；沒有資料時可能是「*/0」
+      const contentRange = res.headers.get('content-range');
+      if(contentRange && contentRange.indexOf('/') !== -1){
+        const totalPart = contentRange.split('/')[1];
+        const parsedTotal = totalPart === '*' ? NaN : parseInt(totalPart, 10);
+        if(!Number.isNaN(parsedTotal)) mixTotalCount = parsedTotal;
+      }
+      mixTotalPages = Math.max(1, Math.ceil(mixTotalCount / MIX_PAGE_SIZE));
+
+      // 資料筆數變動（例如刪除）導致要求的頁碼超出範圍：自動改載最後一個有效頁面
+      if(page > mixTotalPages){
+        mixPageLoading = false;
+        await loadMixPage(mixTotalPages, opts);
+        return;
+      }
+
+      mixCurrentPage = page;
+      mixPageEntries = data;
+      if(page === 1) mixLatestEntries = data; // 首頁／統計只吃第 1 頁（最新資料），切頁不會覆蓋它
+
+      statusEl.textContent = `已連接資料庫，共 ${mixTotalCount} 筆 MIX 觀測紀錄。`;
+      succeeded = true;
     }catch(err){
-      mixEntries = [];
+      // 失敗時保留目前畫面內容，不清空既有表格／分頁，只更新狀態文字
       statusEl.textContent = '資料庫連線失敗，請確認 mix_observations 這張表已建立且 Policy 已開放。';
+    }finally{
+      mixPageLoading = false;
+      renderMixTable();
+      renderMixPagination();
     }
-    renderMixTable();
-    if(typeof renderRecentLog === 'function') renderRecentLog();
-    if(typeof updateDashboardStats === 'function') updateDashboardStats();
+
+    if(succeeded){
+      if(typeof renderRecentLog === 'function') renderRecentLog();
+      if(typeof updateDashboardStats === 'function') updateDashboardStats();
+      if(opts && opts.scrollToSection){
+        const target = document.getElementById('logSecMix');
+        // 'auto' 在有 CSS scroll-behavior:smooth 時仍會被判定成平滑捲動，要用 'instant' 才會真正瞬間跳轉
+        if(target) target.scrollIntoView({ behavior: prefersReducedMotion() ? 'instant' : 'smooth', block:'start' });
+      }
+    }
   }
 
   function openMixModal(){
@@ -1587,7 +1731,8 @@
       });
       if(!res.ok) throw new Error('insert failed: ' + res.status);
       closeMixModal();
-      await loadMixEntries();
+      // 新增成功：自動回到第 1 頁並重新載入，讓使用者立即看到最新那筆
+      await loadMixPage(1);
     }catch(err){
       alert('新增失敗，請確認 mix_observations 資料表與 Policy 是否設定正確。');
     }finally{
@@ -1604,7 +1749,16 @@
   });
   document.getElementById('mixSubmitBtn').addEventListener('click', submitMixEntry);
 
-  loadMixEntries();
+  document.getElementById('mixPrevBtn').addEventListener('click', ()=>{
+    if(mixPageLoading || mixCurrentPage <= 1) return;
+    loadMixPage(mixCurrentPage - 1, { scrollToSection: true });
+  });
+  document.getElementById('mixNextBtn').addEventListener('click', ()=>{
+    if(mixPageLoading || mixCurrentPage >= mixTotalPages) return;
+    loadMixPage(mixCurrentPage + 1, { scrollToSection: true });
+  });
+
+  loadMixPage(1);
 
   // ---------- tabs（含網址 hash 狀態：#home／#log／#progress／#warn） ----------
   const tabBtns = document.querySelectorAll('.tabbtn');
@@ -1670,6 +1824,33 @@
       if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
     });
   });
+
+  // 使用者是否開啟「減少動態效果」，供本次新增的捲動互動（回到頂端／MIX 切頁後捲回）判斷
+  // 是否要用 smooth 還是直接跳轉，函式宣告會 hoist，前面用到也沒問題
+  function prefersReducedMotion(){
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  // ---------- 回到頂端：全站共用（不限 01 分頁） ----------
+  (function initBackToTop(){
+    const btn = document.getElementById('backToTop');
+    if(!btn) return;
+    const SHOW_AFTER = 400;
+    let visible = false;
+    function syncVisibility(){
+      const shouldShow = window.scrollY > SHOW_AFTER;
+      if(shouldShow !== visible){
+        visible = shouldShow;
+        btn.classList.toggle('is-visible', shouldShow);
+      }
+    }
+    window.addEventListener('scroll', syncVisibility, { passive:true });
+    syncVisibility();
+    btn.addEventListener('click', ()=>{
+      // 'auto' 在全站 html{scroll-behavior:smooth} 之下仍會平滑捲動，要用 'instant' 才會真正瞬間跳轉
+      window.scrollTo({ top:0, behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
+    });
+  })();
 
   // ---------- build stage track ----------
   const track = document.getElementById('stageTrack');
