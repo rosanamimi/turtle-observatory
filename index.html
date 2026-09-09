@@ -365,6 +365,71 @@
   .stage-detail .cur{font-family:'Noto Serif TC',serif;font-size:20px;color:var(--ink);margin:4px 0 6px;font-weight:700;}
   .stage-detail p{margin:0;color:var(--ink-soft);font-size:14px;}
 
+  /* ---------- 02·A 目前觀測階段（以 mix_observations.stage 六階段為主要資料來源） ---------- */
+  .stage-overview-card{padding:24px 22px 22px;}
+  .stage-hero{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .stage-hero-num{
+    font-family:'Space Mono',monospace;font-size:42px;font-weight:700;color:var(--wood-deep);
+    line-height:1;flex:0 0 auto;
+  }
+  .stage-hero-body{flex:1 1 auto;min-width:180px;}
+  .stage-hero-name{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:700;color:var(--ink);}
+  .stage-hero-time{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+  .stage-hero-desc{margin:16px 0 0;color:var(--ink-soft);font-size:14.5px;line-height:1.6;}
+
+  .stage-change-tag{
+    display:inline-flex;align-items:center;
+    font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+    padding:5px 12px;border-radius:100px;white-space:nowrap;
+  }
+  .stage-change-up{color:var(--wood-deep);background:rgba(203,174,115,0.12);border:1px solid rgba(203,174,115,0.35);}
+  .stage-change-same{color:var(--ink-soft);background:rgba(183,178,222,0.10);border:1px solid rgba(183,178,222,0.28);}
+  .stage-change-down{color:var(--warn);background:var(--warn-pale);border:1px solid var(--warn-border);}
+  .stage-change-none{color:var(--ink-soft);background:transparent;border:1px solid var(--line-soft);opacity:0.85;}
+
+  .stage-empty{padding:10px 2px;color:var(--ink-soft);}
+  .stage-empty-title{margin:0 0 6px;font-family:'Noto Serif TC',serif;font-size:16px;color:var(--ink);}
+  .stage-empty-hint{margin:0;font-size:13px;line-height:1.6;}
+
+  /* ---------- 02·B 階段軌跡 ---------- */
+  .stage-trajectory-card{padding:20px 20px 18px;}
+  .stage-mini-track{
+    display:flex;gap:0;overflow-x:auto;padding:2px 2px 16px;margin-bottom:14px;
+    border-bottom:1px solid var(--line-soft);scrollbar-width:thin;
+  }
+  .stage-mini-item{
+    flex:1 1 0;min-width:88px;text-align:center;padding:10px 6px;position:relative;opacity:0.42;
+  }
+  .stage-mini-item .num{font-family:'Space Mono',monospace;font-size:13px;color:var(--wood);}
+  .stage-mini-item .nm{font-size:11.5px;margin-top:4px;color:var(--ink-soft);white-space:nowrap;}
+  .stage-mini-item.is-reached{opacity:0.75;}
+  .stage-mini-item.is-current{opacity:1;}
+  .stage-mini-item.is-current .num{color:var(--wood-deep);font-weight:700;}
+  .stage-mini-item.is-current .nm{color:var(--ink);font-weight:700;}
+  .stage-mini-item.is-current::after{
+    content:'';position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);
+    width:26px;height:2px;background:var(--wood-deep);
+  }
+  .stage-tl-empty{margin:0;padding:10px 2px;color:var(--ink-soft);font-size:13.5px;}
+  .stage-tl-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:4px;}
+  .stage-tl-stage{font-family:'Noto Serif TC',serif;font-size:14.5px;font-weight:700;color:var(--ink);}
+  .stage-tl-conclusion{
+    color:var(--ink-soft);font-size:13.5px;line-height:1.6;margin:8px 0 0;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .stage-tl-conclusion.is-expanded{-webkit-line-clamp:unset;overflow:visible;}
+  .stage-tl-toggle{
+    display:inline-block;margin-top:6px;background:transparent;border:none;padding:0;
+    font-family:'Space Mono',monospace;font-size:11.5px;color:var(--wood);cursor:pointer;
+  }
+  .stage-tl-toggle:hover{color:var(--wood-deep);text-decoration:underline;}
+
+  @media (max-width:640px){
+    .stage-mini-track{display:none;}
+    .stage-hero-num{font-size:34px;}
+    .stage-hero-name{font-size:19px;}
+  }
+
   /* ---------- stats grid ---------- */
   .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px 18px;}
   .card.stat-card{
@@ -963,30 +1028,14 @@
   <!-- ======================= TAB1: 階段與進度 ======================= -->
   <section class="tabpanel" id="tab-progress">
 
-    <div class="section-label" style="margin-top:22px;"><span class="num mono">02 · A</span><h2>🐢 龜龜目前階段</h2><div class="rule"></div></div>
-    <div class="card" style="padding:18px 10px 22px;">
-      <div class="stage-track" id="stageTrack"></div>
-      <div class="wrap" style="padding:0 16px;">
-        <div class="stage-detail">
-          <div class="head mono">CURRENT STAGE</div>
-          <div class="cur" id="stageCur">⑤ 研究開門角度</div>
-          <p id="stageDesc">龜龜目前已經知道門怎麼開，但正在研究推門需要幾度。</p>
-        </div>
-      </div>
+    <div class="section-label" style="margin-top:22px;"><span class="num mono">02 · A</span><h2>🐢 龜龜目前觀測階段</h2><div class="rule"></div></div>
+    <div class="card stage-overview-card" id="stageOverview">
+      <!-- 由 renderStageOverview() 依 mixLatestEntries（MIX 六階段資料）動態產生，避免與舊版十階段模型並存造成混淆 -->
     </div>
 
-    <div class="section-label"><span class="num mono">02 · B</span><h2>🚪 推門進度</h2><div class="rule"></div></div>
-    <div class="card progress-card">
-      <div class="progress-head">
-        <h3>心理／行動進程位置</h3>
-        <span class="progress-num mono" id="progressNum">73%</span>
-      </div>
-      <div class="bar-outer"><div class="bar-inner" id="progressBar" style="width:73%;"></div></div>
-      <p class="disclaimer">＊此百分比代表「心理／行動進程位置」，不是實際成功機率。</p>
-      <div class="mini-hints">
-        <div class="mini-hint"><div class="k mono">距離真正推門</div><div class="v">未知</div></div>
-        <div class="mini-hint"><div class="k mono">距離下一次摸門把</div><div class="v">非常近</div></div>
-      </div>
+    <div class="section-label"><span class="num mono">02 · B</span><h2>📈 階段軌跡</h2><div class="rule"></div></div>
+    <div class="card stage-trajectory-card" id="stageTrajectory">
+      <!-- 由 renderStageTrajectory() 依 mixLatestEntries 動態產生 -->
     </div>
 
     <div class="section-label"><span class="num mono">02 · C</span><h2>🐢 龜龜今日行為統計</h2><div class="rule"></div></div>
@@ -1360,6 +1409,123 @@
     return idx === -1 ? null : idx;
   }
 
+  // ---------- 02·A／02·B：以 mix_observations.stage 六階段為主要資料來源 ----------
+  // 文案與「新增 MIX 紀錄」表單的 #mixStage 選項保持一致，避免兩處措辭不同調
+  const STAGE_NAMES = ['🌱 尚未形成','👀 開始靠近','🚪 心理放行','🤏 準備行動','✋ 發送前臨界','💬 已發送'];
+  const STAGE_ONE_LINERS = [
+    '還沒有明確的主動行動傾向。',
+    '開始出現聯絡念頭、尋找理由或入口。',
+    '心理上已經允許自己靠近，但尚未進入實際準備。',
+    '開始處理「怎麼傳、什麼時候傳、傳什麼」。',
+    '實際行動已非常接近，只差最後一步。',
+    '第一則主動小訊息已實際發出。'
+  ];
+  function stageFullLabel(idx){
+    return `${STAGE_ORDER[idx]} ${STAGE_NAMES[idx]}`;
+  }
+  // 只保留 stage 欄位可辨識（非空、且開頭是①～⑥其中之一）的紀錄；忽略空值／格式無法辨識的紀錄
+  function validMixEntries(){
+    return (typeof mixLatestEntries !== 'undefined' ? mixLatestEntries : []).filter(e => stageIndexOf(e.stage) !== null);
+  }
+  // 比較「目前」與「前一筆」的六階段索引，回傳狀態類型與顯示文字
+  function stageChangeLabel(curIdx, prevIdx, noPrevLabel){
+    if(prevIdx === null || prevIdx === undefined){
+      return { type:'none', label: noPrevLabel || '尚無前次觀測可比較' };
+    }
+    if(curIdx === prevIdx) return { type:'same', label:'維持原階段' };
+    if(curIdx > prevIdx) return { type:'up', label:`前進 ${curIdx - prevIdx} 階` };
+    return { type:'down', label:`回落 ${prevIdx - curIdx} 階` };
+  }
+
+  // 02·A：目前觀測階段——只顯示「最新一筆有效 MIX 紀錄」的六階段資訊，不換算成看似精確的成功機率
+  function renderStageOverview(){
+    const container = document.getElementById('stageOverview');
+    if(!container) return;
+    const valid = validMixEntries();
+    if(valid.length === 0){
+      container.innerHTML = `
+        <div class="stage-empty">
+          <p class="stage-empty-title">尚無可用的 MIX 觀測資料</p>
+          <p class="stage-empty-hint">請先到「01 · C MIX 龜龜觀測站」新增一筆含有效階段的觀測紀錄，這裡才會顯示龜龜目前的六階段觀測位置。</p>
+        </div>`;
+      return;
+    }
+    const latest = valid[0];
+    const prev = valid.length > 1 ? valid[1] : null;
+    const curIdx = stageIndexOf(latest.stage);
+    const prevIdx = prev ? stageIndexOf(prev.stage) : null;
+    const change = stageChangeLabel(curIdx, prevIdx);
+    container.innerHTML = `
+      <div class="stage-hero">
+        <div class="stage-hero-num mono">${STAGE_ORDER[curIdx]}</div>
+        <div class="stage-hero-body">
+          <div class="stage-hero-name">${STAGE_NAMES[curIdx]}</div>
+          <div class="stage-hero-time mono">最新觀測時間：${formatMixTime(latest.observed_at)}</div>
+        </div>
+        <span class="stage-change-tag stage-change-${change.type}">${change.label}</span>
+      </div>
+      <p class="stage-hero-desc">${escapeHtml(STAGE_ONE_LINERS[curIdx])}</p>
+    `;
+  }
+
+  // 02·B：階段軌跡——最近 10 筆有效 MIX 紀錄，由舊到新排列，保留連續重複階段（不去重）
+  function renderStageTrajectory(){
+    const container = document.getElementById('stageTrajectory');
+    if(!container) return;
+    const valid = validMixEntries(); // 新→舊
+    if(valid.length === 0){
+      container.innerHTML = `<p class="stage-tl-empty">尚無可用的 MIX 觀測資料，暫無階段軌跡可顯示。</p>`;
+      return;
+    }
+    const reachedSet = new Set(valid.map(e => stageIndexOf(e.stage)));
+    const curIdx = stageIndexOf(valid[0].stage);
+    const trackHtml = `
+      <div class="stage-mini-track" aria-hidden="true">
+        ${STAGE_ORDER.map((num,i)=>`
+          <div class="stage-mini-item${i===curIdx?' is-current':''}${reachedSet.has(i)?' is-reached':''}">
+            <div class="num">${num}</div>
+            <div class="nm">${STAGE_NAMES[i]}</div>
+          </div>
+        `).join('')}
+      </div>`;
+
+    const chronological = [...valid].reverse(); // 舊→新
+    const n = chronological.length;
+    const listHtml = chronological.map((e, i)=>{
+      const idx = stageIndexOf(e.stage);
+      const descPos = n - 1 - i; // 對應回 valid（新→舊）陣列中的位置
+      const prevEntry = descPos < valid.length - 1 ? valid[descPos + 1] : null;
+      const prevIdx = prevEntry ? stageIndexOf(prevEntry.stage) : null;
+      const change = prevEntry ? stageChangeLabel(idx, prevIdx) : { type:'none', label:'本區間最早紀錄' };
+      const conclusion = e.conclusion ? escapeHtml(e.conclusion) : '';
+      const entryId = `stageTl${i}`;
+      return `
+        <div class="tl-entry">
+          <div class="tl-time">${formatMixTime(e.observed_at)}</div>
+          <div class="stage-tl-row">
+            <span class="stage-tl-stage">${stageFullLabel(idx)}</span>
+            <span class="stage-change-tag stage-change-${change.type}">${change.label}</span>
+          </div>
+          ${conclusion ? `
+          <div class="tl-body">
+            <p class="stage-tl-conclusion" id="${entryId}">${conclusion}</p>
+            <button type="button" class="stage-tl-toggle" data-target="${entryId}">展開全文</button>
+          </div>` : ''}
+        </div>`;
+    }).join('');
+
+    container.innerHTML = trackHtml + `<div class="timeline">${listHtml}</div>`;
+
+    container.querySelectorAll('.stage-tl-toggle').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const p = document.getElementById(btn.dataset.target);
+        if(!p) return;
+        const expanded = p.classList.toggle('is-expanded');
+        btn.textContent = expanded ? '收合' : '展開全文';
+      });
+    });
+  }
+
   const LOCATION_BY_STAGE = ['遠處觀望','靠近門口','門前','門把旁','手已放上門把','門後'];
   const MIND_BASELINE_BY_STAGE = [20, 40, 60, 75, 90, 99];
   const MSG_MID_BY_STAGE = [15, 38, 58, 75, 90, 99]; // 訊息準備度區間取中間值：10–20/30–45/50–65/70–80/85–95/99
@@ -1677,6 +1843,8 @@
     if(succeeded){
       if(typeof renderRecentLog === 'function') renderRecentLog();
       if(typeof updateDashboardStats === 'function') updateDashboardStats();
+      if(typeof renderStageOverview === 'function') renderStageOverview();
+      if(typeof renderStageTrajectory === 'function') renderStageTrajectory();
       if(opts && opts.scrollToSection){
         const target = document.getElementById('logSecMix');
         // 'auto' 在有 CSS scroll-behavior:smooth 時仍會被判定成平滑捲動，要用 'instant' 才會真正瞬間跳轉
@@ -1853,8 +2021,12 @@
   })();
 
   // ---------- build stage track ----------
+  // 02·A／02·B 改版後，stageTrack／stageCur／stageDesc／progressNum／progressBar
+  // 這些 DOM 節點已不存在於畫面上；以下函式維持運作（供 checkBtn／pushBtn／updateDashboardStats
+  // 內部的 progress 數值引擎與首頁 sceneCard 動畫使用），對已移除的節點一律加上 null 檢查，避免拋出例外。
   const track = document.getElementById('stageTrack');
   function renderStages(currentIdx){
+    if(!track) return;
     track.innerHTML = '';
     stages.forEach((s,i)=>{
       const el = document.createElement('div');
@@ -1869,8 +2041,10 @@
   function updateStageBlock(){
     const idx = stageIndexFromProgress(progress);
     renderStages(idx);
-    document.getElementById('stageCur').textContent = `${toCircled(idx+1)} ${stages[idx]}`;
-    document.getElementById('stageDesc').textContent = stageDescs[idx];
+    const curEl = document.getElementById('stageCur');
+    const descEl = document.getElementById('stageDesc');
+    if(curEl) curEl.textContent = `${toCircled(idx+1)} ${stages[idx]}`;
+    if(descEl) descEl.textContent = stageDescs[idx];
   }
   function toCircled(n){
     const circled = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
@@ -1879,8 +2053,10 @@
 
   function setProgress(p, animateDir){
     progress = Math.max(0, Math.min(99, Math.round(p)));
-    document.getElementById('progressNum').textContent = progress + '%';
-    document.getElementById('progressBar').style.width = progress + '%';
+    const numEl = document.getElementById('progressNum');
+    const barEl = document.getElementById('progressBar');
+    if(numEl) numEl.textContent = progress + '%';
+    if(barEl) barEl.style.width = progress + '%';
     document.getElementById('statMind').textContent = progress + '%';
     updateStageBlock();
     if(animateDir === 'back'){
@@ -2004,6 +2180,8 @@
 
   // ---------- init ----------
   updateStageBlock();
+  renderStageOverview();
+  renderStageTrajectory();
   pushWarnLog("龜龜正在思考。");
   randomWarning(false);
   syncObsReport();
