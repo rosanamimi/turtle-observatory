@@ -515,6 +515,43 @@
   .wear-bar-inner{height:100%;background:linear-gradient(90deg,#8A6E36,var(--wood-deep));border-radius:100px;transition:width .8s ease;}
   .wear-quotes p{margin:2px 0;font-size:13.5px;color:var(--ink-soft);}
 
+  .wear-status-row{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;margin:14px 0 4px;}
+  .wear-status-tag{
+    display:inline-flex;align-items:center;flex:0 0 auto;
+    font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+    padding:5px 12px;border-radius:100px;white-space:nowrap;
+  }
+  .wear-status-tag.tier-good{color:var(--ink-soft);background:transparent;border:1px solid var(--line-soft);}
+  .wear-status-tag.tier-mid{color:var(--wood-deep);background:rgba(203,174,115,0.10);border:1px solid rgba(203,174,115,0.28);}
+  .wear-status-tag.tier-high{color:var(--wood-deep);background:rgba(203,174,115,0.16);border:1px solid rgba(203,174,115,0.42);}
+  .wear-status-tag.tier-critical{color:var(--warn);background:var(--warn-pale);border:1px solid var(--warn-border);}
+  .wear-status-desc{margin:4px 0 0;font-size:13.5px;color:var(--ink-soft);flex:1 1 200px;}
+
+  .wear-mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;}
+  .wear-mini-item{
+    background:var(--paper-2);border:1px solid var(--line-soft);border-radius:12px;
+    padding:10px 12px;text-align:center;
+  }
+  .wear-mini-item .k{display:block;font-family:'Space Mono',monospace;font-size:11px;color:var(--ink-soft);}
+  .wear-mini-item .v{display:block;margin-top:4px;font-family:'Noto Serif TC',serif;font-weight:700;color:var(--ink);font-size:14.5px;}
+  .wear-disclaimer{margin:14px 0 0;font-size:11.5px;color:var(--ink-soft);font-style:italic;}
+
+  @media (max-width:640px){
+    .wear-mini-stats{grid-template-columns:1fr 1fr;}
+    .wear-mini-stats .wear-mini-item:last-child{grid-column:1 / -1;}
+  }
+
+  /* ---------- 門把離職通知彩蛋 ---------- */
+  .resign-modal-box{max-width:440px;}
+  .resign-modal-box .modal-body{gap:10px;}
+  .resign-modal-text{margin:0;color:var(--ink);font-size:14.5px;line-height:1.7;}
+  .resign-modal-sign{margin:4px 0 0;color:var(--ink-soft);font-size:13px;text-align:right;}
+  #resignModalOverlay.open .resign-modal-box{animation:resignModalPopIn .28s ease;}
+  @keyframes resignModalPopIn{
+    from{opacity:0;transform:translateY(14px) scale(.97);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+  }
+
   /* ---------- quote card ---------- */
   .quote-card{
     padding:30px 28px;text-align:center;
@@ -1060,13 +1097,40 @@
         <span class="wear-num mono">81%</span>
       </div>
       <div class="wear-bar-outer"><div class="wear-bar-inner" style="width:81%;"></div></div>
+      <div class="wear-status-row">
+        <span class="wear-status-tag tier-high" id="wearStatusTag">高度磨損</span>
+        <p class="wear-status-desc" id="wearStatusDesc">門把已經開始懷疑人生。</p>
+      </div>
       <div class="wear-quotes">
         <p>「龜龜每天摸。」</p>
         <p>「門把已經開始懷疑人生。」</p>
       </div>
+      <div class="wear-mini-stats" id="wearMiniStats">
+        <div class="wear-mini-item"><span class="k">查看狀態</span><span class="v" id="wearCheckCount">0 次</span></div>
+        <div class="wear-mini-item"><span class="k">催促龜龜</span><span class="v" id="wearPushCount">0 次</span></div>
+        <div class="wear-mini-item"><span class="k">真正開門</span><span class="v" id="wearOpenCount">0 次</span></div>
+      </div>
+      <p class="wear-disclaimer">＊此數值為觀測所娛樂性統計，非正式資料庫指標。</p>
     </div>
 
   </section>
+
+  <!-- 門把離職通知彩蛋（磨損首次到達 99% 時自動顯示一次） -->
+  <div class="modal-overlay" id="resignModalOverlay" role="dialog" aria-modal="true" aria-labelledby="resignModalTitle">
+    <div class="modal-box resign-modal-box">
+      <div class="modal-head">
+        <h3 id="resignModalTitle">🖐️ 門把離職通知</h3>
+        <button type="button" class="modal-close" id="resignModalCloseX" aria-label="關閉">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="resign-modal-text">本人自上任以來，長期承受反覆觸摸、角度研究與無效確認。<br>由於開門次數始終為零，現正式提出離職申請。</p>
+        <p class="resign-modal-sign">— 已經受夠的門把</p>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="act btn-primary" id="resignModalConfirmBtn">慰留門把</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ======================= TAB2: 觀察紀錄 ======================= -->
   <section class="tabpanel" id="tab-log">
@@ -1289,6 +1353,97 @@
   let wear = 81;
   const sceneCard = document.getElementById('sceneCard');
   const warnLogEntries = [];
+
+  // ---------- 02·D 門把磨損：localStorage 持久化（純娛樂性互動統計，不進資料庫） ----------
+  let handleCheckCount = 0;
+  let handlePushCount = 0;
+  let handleResignationSeen = false;
+
+  function readWearNum(key, fallback, min, max){
+    try{
+      const raw = localStorage.getItem(key);
+      if(raw === null) return fallback;
+      const n = Number(raw);
+      if(!Number.isFinite(n)) return fallback;
+      return Math.max(min, Math.min(max, Math.round(n)));
+    }catch(err){
+      return fallback; // localStorage 不可用（例如無痕模式限制）時安全回到預設值
+    }
+  }
+  function readWearBool(key){
+    try{
+      return localStorage.getItem(key) === '1';
+    }catch(err){
+      return false;
+    }
+  }
+  function loadWearState(){
+    wear = readWearNum('handleWear', 81, 0, 99);
+    handleCheckCount = readWearNum('handleCheckCount', 0, 0, 999999);
+    handlePushCount = readWearNum('handlePushCount', 0, 0, 999999);
+    handleResignationSeen = readWearBool('handleResignationSeen');
+  }
+  function saveWearState(){
+    try{
+      localStorage.setItem('handleWear', String(wear));
+      localStorage.setItem('handleCheckCount', String(handleCheckCount));
+      localStorage.setItem('handlePushCount', String(handlePushCount));
+      localStorage.setItem('handleResignationSeen', handleResignationSeen ? '1' : '0');
+    }catch(err){
+      // localStorage 不可寫入時安全略過，不影響畫面互動
+    }
+  }
+  // 依磨損百分比回傳狀態標籤／說明／色系分級；六階段 MIX 資料完全無關，只是同一套暖金／深紫視覺語言
+  function wearStatusInfo(w){
+    if(w >= 99) return { label:'拒絕繼續配合', desc:'門把已正式提出離職申請。', tier:'critical' };
+    if(w >= 90) return { label:'瀕臨崩潰', desc:'建議龜龜儘快決定是否真的要開門。', tier:'critical' };
+    if(w >= 70) return { label:'高度磨損', desc:'門把已經開始懷疑人生。', tier:'high' };
+    if(w >= 40) return { label:'出現使用痕跡', desc:'偵測到長期觸摸，但推門次數仍然偏低。', tier:'mid' };
+    return { label:'狀態良好', desc:'目前仍可承受龜龜的反覆確認。', tier:'good' };
+  }
+  // 「真正開門」沿用 02·C 已經算好的真實事件結果（#behOpen），不因按鈕點擊而增加
+  function renderWearOpenCount(){
+    const openEl = document.getElementById('wearOpenCount');
+    if(!openEl) return;
+    const sourceEl = document.getElementById('behOpen');
+    openEl.textContent = sourceEl ? sourceEl.textContent : '0 次';
+  }
+  function renderWearUI(){
+    document.querySelectorAll('.wear-num').forEach(el=> el.textContent = wear + '%');
+    document.querySelectorAll('.wear-bar-inner').forEach(el=> el.style.width = wear + '%');
+    const info = wearStatusInfo(wear);
+    const tagEl = document.getElementById('wearStatusTag');
+    const descEl = document.getElementById('wearStatusDesc');
+    if(tagEl){
+      tagEl.textContent = info.label;
+      tagEl.className = 'wear-status-tag tier-' + info.tier;
+    }
+    if(descEl) descEl.textContent = info.desc;
+    const checkEl = document.getElementById('wearCheckCount');
+    const pushEl = document.getElementById('wearPushCount');
+    if(checkEl) checkEl.textContent = handleCheckCount + ' 次';
+    if(pushEl) pushEl.textContent = handlePushCount + ' 次';
+    renderWearOpenCount();
+  }
+  function openResignModal(){
+    const overlay = document.getElementById('resignModalOverlay');
+    if(!overlay) return;
+    overlay.classList.add('open');
+    const btn = document.getElementById('resignModalConfirmBtn');
+    if(btn) btn.focus();
+  }
+  function closeResignModal(){
+    const overlay = document.getElementById('resignModalOverlay');
+    if(overlay) overlay.classList.remove('open');
+  }
+  // 磨損首次到達 99% 且尚未看過彩蛋時才自動彈出；顯示當下就標記已看過，確保同一瀏覽器只自動出現一次
+  function maybeShowResignEgg(){
+    if(wear >= 99 && !handleResignationSeen){
+      handleResignationSeen = true;
+      saveWearState();
+      openResignModal();
+    }
+  }
 
   // ---------- 觀察日：從 8/13 開始計算 ----------
   function updateDayCount(){
@@ -1622,6 +1777,7 @@
     document.getElementById('behPrep').textContent = prepToday + ' 次';
     document.getElementById('behPush').textContent = pushCount + ' 次';
     document.getElementById('behOpen').textContent = openCount + ' 次';
+    renderWearOpenCount();
     document.getElementById('behPushCard').classList.toggle('zero', pushCount === 0);
     document.getElementById('behOpenCard').classList.toggle('zero', openCount === 0);
 
@@ -2072,8 +2228,9 @@
 
   function setWear(w){
     wear = Math.max(0, Math.min(99, Math.round(w)));
-    document.querySelectorAll('.wear-num').forEach(el=> el.textContent = wear + '%');
-    document.querySelectorAll('.wear-bar-inner').forEach(el=> el.style.width = wear + '%');
+    saveWearState();
+    renderWearUI();
+    maybeShowResignEgg();
   }
 
   function setToast(msg){
@@ -2150,6 +2307,7 @@
     document.getElementById('statTouch').textContent = touchCount + ' 次';
     document.getElementById('behTouch').textContent = touchCount + ' 次';
 
+    handleCheckCount += 1;
     setWear(wear + (Math.random()<0.5?1:0));
 
     document.getElementById('behaviorTag').textContent = behaviorTags[Math.floor(Math.random()*behaviorTags.length)];
@@ -2173,15 +2331,37 @@
 
   document.getElementById('pushBtn').addEventListener('click', ()=>{
     setProgress(progress - 1, 'back');
+    handlePushCount += 1;
+    setWear(wear + 1);
     document.getElementById('behaviorTag').textContent = "🐢 目前行為：看了你一眼，然後縮回殼裡";
     setToast("「龜龜看了你一眼。」「然後縮回殼裡。」進度 -1%。");
     syncObsReport();
   });
 
+  // ---------- 門把離職通知彩蛋：關閉互動（按鈕／ESC／點擊遮罩） ----------
+  (function initResignModal(){
+    const overlay = document.getElementById('resignModalOverlay');
+    const confirmBtn = document.getElementById('resignModalConfirmBtn');
+    const closeX = document.getElementById('resignModalCloseX');
+    if(confirmBtn) confirmBtn.addEventListener('click', closeResignModal);
+    if(closeX) closeX.addEventListener('click', closeResignModal);
+    if(overlay){
+      overlay.addEventListener('click', (e)=>{
+        if(e.target.id === 'resignModalOverlay') closeResignModal();
+      });
+    }
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && overlay && overlay.classList.contains('open')) closeResignModal();
+    });
+  })();
+
   // ---------- init ----------
   updateStageBlock();
   renderStageOverview();
   renderStageTrajectory();
+  loadWearState();
+  renderWearUI();
+  maybeShowResignEgg();
   pushWarnLog("龜龜正在思考。");
   randomWarning(false);
   syncObsReport();
