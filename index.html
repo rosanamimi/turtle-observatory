@@ -1627,7 +1627,7 @@
     `;
   }
 
-  // 02·B：階段軌跡——最近 10 筆有效 MIX 紀錄，由舊到新排列，保留連續重複階段（不去重）
+  // 02·B：階段軌跡——最近 10 筆有效 MIX 紀錄，由新到舊排列，保留連續重複階段（不去重）
   function renderStageTrajectory(){
     const container = document.getElementById('stageTrajectory');
     if(!container) return;
@@ -1648,12 +1648,9 @@
         `).join('')}
       </div>`;
 
-    const chronological = [...valid].reverse(); // 舊→新
-    const n = chronological.length;
-    const listHtml = chronological.map((e, i)=>{
+    const listHtml = valid.map((e, i)=>{
       const idx = stageIndexOf(e.stage);
-      const descPos = n - 1 - i; // 對應回 valid（新→舊）陣列中的位置
-      const prevEntry = descPos < valid.length - 1 ? valid[descPos + 1] : null;
+      const prevEntry = valid[i + 1] || null; // 與時間較早的前一次觀測比較
       const prevIdx = prevEntry ? stageIndexOf(prevEntry.stage) : null;
       const change = prevEntry ? stageChangeLabel(idx, prevIdx) : { type:'none', label:'本區間最早紀錄' };
       const conclusion = e.conclusion ? escapeHtml(e.conclusion) : '';
