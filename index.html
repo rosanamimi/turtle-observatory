@@ -423,6 +423,7 @@
     font-family:'Space Mono',monospace;font-size:11.5px;color:var(--wood);cursor:pointer;
   }
   .stage-tl-toggle:hover{color:var(--wood-deep);text-decoration:underline;}
+  .stage-tl-toggle[hidden]{display:none;}
 
   @media (max-width:640px){
     .stage-mini-track{display:none;}
@@ -1665,7 +1666,7 @@
           ${conclusion ? `
           <div class="tl-body">
             <p class="stage-tl-conclusion" id="${entryId}">${conclusion}</p>
-            <button type="button" class="stage-tl-toggle" data-target="${entryId}">展開全文</button>
+            <button type="button" class="stage-tl-toggle" data-target="${entryId}" aria-controls="${entryId}" aria-expanded="false" hidden>展開全文</button>
           </div>` : ''}
         </div>`;
     }).join('');
@@ -1678,9 +1679,27 @@
         if(!p) return;
         const expanded = p.classList.toggle('is-expanded');
         btn.textContent = expanded ? '收合' : '展開全文';
+        btn.setAttribute('aria-expanded', String(expanded));
       });
     });
+    syncStageTrajectoryToggles();
   }
+
+  function syncStageTrajectoryToggles(){
+    document.querySelectorAll('#stageTrajectory .stage-tl-toggle').forEach(btn=>{
+      const p = document.getElementById(btn.dataset.target);
+      if(!p || !p.getClientRects().length) return; // 隱藏分頁等切換顯示後再量測
+      const expanded = p.classList.contains('is-expanded');
+      p.classList.remove('is-expanded');
+      const truncated = p.scrollHeight > p.clientHeight + 1;
+      p.classList.toggle('is-expanded', expanded && truncated);
+      btn.hidden = !truncated;
+      btn.textContent = expanded && truncated ? '收合' : '展開全文';
+      btn.setAttribute('aria-expanded', String(expanded && truncated));
+    });
+  }
+  window.addEventListener('resize', syncStageTrajectoryToggles);
+  if(document.fonts) document.fonts.ready.then(syncStageTrajectoryToggles);
 
   const LOCATION_BY_STAGE = ['遠處觀望','靠近門口','門前','門把旁','手已放上門把','門後'];
   const MIND_BASELINE_BY_STAGE = [20, 40, 60, 75, 90, 99];
@@ -2101,6 +2120,7 @@
     panels.forEach(p=>p.classList.remove('active'));
     targetBtn.classList.add('active'); targetBtn.setAttribute('aria-selected','true');
     targetPanel.classList.add('active');
+    if(tabName === 'progress') syncStageTrajectoryToggles();
     if(scroll) window.scrollTo({top:0, behavior:'smooth'});
     return true;
   }
