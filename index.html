@@ -1555,12 +1555,16 @@
     return `${d.getMonth()+1}/${d.getDate()}`;
   }
 
-  // 階段對照表：MIX stage 開頭圈數字 → 索引 0~5
+  // 階段對照表：支援舊版圈數字與心理／行動標記；雙軸紀錄優先採用行動階段。
   const STAGE_ORDER = ['①','②','③','④','⑤','⑥'];
   function stageIndexOf(stageStr){
-    if(!stageStr) return null;
-    const ch = stageStr.trim().charAt(0);
-    const idx = STAGE_ORDER.indexOf(ch);
+    if(typeof stageStr !== 'string') return null;
+    const value = stageStr.trim();
+    const action = value.match(/(?:^|[；;｜|，,\s])行動\s*([①②③④⑤⑥])/);
+    const legacy = value.match(/^([①②③④⑤⑥])/);
+    const mind = value.match(/^心理\s*([①②③④⑤⑥])/);
+    const match = action || legacy || mind;
+    const idx = match ? STAGE_ORDER.indexOf(match[1]) : -1;
     return idx === -1 ? null : idx;
   }
 
@@ -1578,7 +1582,7 @@
   function stageFullLabel(idx){
     return `${STAGE_ORDER[idx]} ${STAGE_NAMES[idx]}`;
   }
-  // 只保留 stage 欄位可辨識（非空、且開頭是①～⑥其中之一）的紀錄；忽略空值／格式無法辨識的紀錄
+  // 只保留 stage 欄位可辨識的紀錄；忽略空值／格式無法辨識的紀錄。
   function validMixEntries(){
     return (typeof mixLatestEntries !== 'undefined' ? mixLatestEntries : []).filter(e => stageIndexOf(e.stage) !== null);
   }
