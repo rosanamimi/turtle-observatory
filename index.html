@@ -398,29 +398,31 @@
     border-bottom:1px solid var(--line-soft);scrollbar-width:thin;
   }
   .stage-mini-item{
-    flex:1 1 0;min-width:88px;text-align:center;padding:10px 6px;position:relative;opacity:0.42;
+    flex:1 1 0;min-width:144px;text-align:center;padding:14px 8px;position:relative;
   }
-  .stage-mini-item .num{font-family:'Space Mono',monospace;font-size:13px;color:var(--wood);}
-  .stage-mini-item .nm{font-size:11.5px;margin-top:4px;color:var(--ink-soft);white-space:nowrap;}
-  .stage-mini-item.is-reached{opacity:0.75;}
+  .stage-mini-item .num{font-family:'Space Mono',monospace;font-size:26px;line-height:1.3;color:var(--wood);}
+  .stage-mini-item .nm{font-size:18px;line-height:1.6;margin-top:8px;color:var(--ink-soft);white-space:nowrap;}
+  .stage-mini-item.is-reached .nm{color:var(--ink);}
   .stage-mini-item.is-current{opacity:1;}
   .stage-mini-item.is-current .num{color:var(--wood-deep);font-weight:700;}
   .stage-mini-item.is-current .nm{color:var(--ink);font-weight:700;}
   .stage-mini-item.is-current::after{
     content:'';position:absolute;left:50%;bottom:-1px;transform:translateX(-50%);
-    width:26px;height:2px;background:var(--wood-deep);
+    width:40px;height:3px;background:var(--wood-deep);
   }
   .stage-tl-empty{margin:0;padding:10px 2px;color:var(--ink-soft);font-size:13.5px;}
   .stage-tl-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:4px;}
-  .stage-tl-stage{font-family:'Noto Serif TC',serif;font-size:14.5px;font-weight:700;color:var(--ink);}
+  .stage-tl-stage{font-family:'Noto Serif TC',serif;font-size:18px;font-weight:700;color:var(--ink);}
+  .stage-trajectory-card .tl-time{font-size:15px;}
+  .stage-trajectory-card .stage-change-tag{font-size:14px;}
   .stage-tl-conclusion{
-    color:var(--ink-soft);font-size:13.5px;line-height:1.6;margin:8px 0 0;
+    color:var(--ink-soft);font-size:16px;line-height:1.75;margin:10px 0 0;
     display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
   }
   .stage-tl-conclusion.is-expanded{-webkit-line-clamp:unset;overflow:visible;}
   .stage-tl-toggle{
     display:inline-block;margin-top:6px;background:transparent;border:none;padding:0;
-    font-family:'Space Mono',monospace;font-size:11.5px;color:var(--wood);cursor:pointer;
+    font-family:'Space Mono',monospace;font-size:14px;color:var(--wood);cursor:pointer;
   }
   .stage-tl-toggle:hover{color:var(--wood-deep);text-decoration:underline;}
   .stage-tl-toggle[hidden]{display:none;}
