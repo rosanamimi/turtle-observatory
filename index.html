@@ -394,14 +394,15 @@
   /* ---------- 02·B 階段軌跡 ---------- */
   .stage-trajectory-card{padding:20px 20px 18px;}
   .stage-mini-track{
-    display:flex;gap:0;overflow-x:auto;padding:2px 2px 16px;margin-bottom:14px;
-    border-bottom:1px solid var(--line-soft);scrollbar-width:thin;
+    display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;
+    padding:0 0 8px;margin-bottom:14px;
+    border-bottom:1px solid var(--line-soft);
   }
   .stage-mini-item{
-    flex:1 1 0;min-width:144px;text-align:center;padding:14px 8px;position:relative;
+    min-width:0;text-align:center;padding:4px 2px 8px;position:relative;
   }
   .stage-mini-item .num{font-family:'Space Mono',monospace;font-size:26px;line-height:1.3;color:var(--wood);}
-  .stage-mini-item .nm{font-size:18px;line-height:1.6;margin-top:8px;color:var(--ink-soft);white-space:nowrap;}
+  .stage-mini-item .nm{font-size:18px;line-height:1.4;margin-top:2px;color:var(--ink-soft);overflow-wrap:anywhere;}
   .stage-mini-item.is-reached .nm{color:var(--ink);}
   .stage-mini-item.is-current{opacity:1;}
   .stage-mini-item.is-current .num{color:var(--wood-deep);font-weight:700;}
