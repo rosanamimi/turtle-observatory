@@ -573,20 +573,30 @@
   /* ---------- MIX ---------- */
   .mix-card{padding:22px 24px;}
   .mix-add-btn{padding:9px 18px;font-size:13.5px;box-shadow:none;}
-  .mix-table-wrap{overflow-x:auto;}
-  .mix-table{width:100%;border-collapse:collapse;min-width:820px;table-layout:fixed;}
-  .mix-table thead th{
-    text-align:left;font-family:'Space Mono',monospace;font-size:11.5px;color:var(--ink-soft);
-    padding:0 12px 10px;border-bottom:1px solid var(--line);white-space:nowrap;
-  }
-  .mix-table tbody td{
-    padding:12px;vertical-align:top;font-size:13.5px;color:var(--ink);
-    border-bottom:1px dashed var(--line-soft);
-    white-space:normal;word-break:break-word;overflow-wrap:anywhere;line-height:1.65;
-  }
-  .mix-table tbody tr:last-child td{border-bottom:none;}
-  .mix-table td.mix-time{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);white-space:nowrap;}
-  .mix-table td.mix-stage{font-weight:700;color:var(--wood-deep);white-space:normal;}
+  .mix-records{display:grid;gap:22px;max-width:880px;margin:0 auto;}
+  .mix-record{padding:24px 28px;background:rgba(8,10,24,.58);border:1px solid rgba(180,169,234,.13);border-radius:14px;min-width:0;}
+  .mix-record-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+  .mix-record-time{display:flex;flex-direction:column;gap:4px;flex-shrink:0;font-family:'Space Mono',monospace;font-size:12px;color:var(--ink-soft);}
+  .mix-stages{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;min-width:0;}
+  .mix-stage-badge{display:inline-block;max-width:100%;overflow-wrap:anywhere;border-radius:100px;padding:5px 12px;font-size:13px;font-weight:700;line-height:1.6;}
+  .mix-stage-a{color:var(--wood-deep);background:rgba(203,174,115,.12);border:1px solid rgba(203,174,115,.35);}
+  .mix-stage-p{color:#c7bae7;background:rgba(168,147,210,.12);border:1px solid rgba(168,147,210,.28);}
+  .mix-stage-f{color:#a3cbd4;background:rgba(121,177,191,.12);border:1px solid rgba(121,177,191,.28);}
+  .mix-stage-r{color:#d6b7d1;background:rgba(189,148,180,.12);border:1px solid rgba(189,148,180,.28);}
+  .mix-components{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+  .mix-component{font-size:12px;line-height:1.5;color:var(--ink-soft);background:rgba(180,169,234,.06);border:1px solid rgba(180,169,234,.12);border-radius:6px;padding:3px 8px;overflow-wrap:anywhere;max-width:100%;}
+  .mix-reading{margin-top:20px;}
+  .mix-reading h3{font-family:'Space Mono','Noto Sans TC',monospace;font-size:11px;font-weight:400;letter-spacing:.06em;color:#b4a9d0;margin:0 0 8px;line-height:1.7;}
+  .mix-copy{white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;}
+  .mix-question .mix-copy{font-size:14px;line-height:1.8;color:#b9b5ca;-webkit-line-clamp:3;}
+  .mix-conclusion{padding-top:20px;border-top:1px solid rgba(203,174,115,.12);}
+  .mix-conclusion h3{color:var(--wood);}
+  .mix-conclusion .mix-copy{font-size:16px;line-height:1.9;color:#ece8f5;-webkit-line-clamp:4;}
+  .mix-copy.is-expanded{display:block;-webkit-line-clamp:unset;overflow:visible;}
+  .mix-expand{display:block;min-height:44px;padding:8px 0;margin-top:4px;border:0;background:transparent;color:var(--wood-deep);font:inherit;font-size:13px;cursor:pointer;text-align:left;}
+  .mix-expand[hidden]{display:none;}
+  .mix-expand:hover{color:#ece8f5;}
+  .mix-expand:focus-visible{outline:2px solid var(--wood);outline-offset:3px;border-radius:4px;}
   .mix-empty{display:none;text-align:center;color:var(--ink-soft);font-size:13.5px;padding:20px 0;}
   .mix-warn{
     margin-top:16px;display:flex;gap:10px;align-items:flex-start;
@@ -613,48 +623,13 @@
   .mix-page-btn:disabled{opacity:0.4;cursor:not-allowed;}
   .mix-page-info{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-soft);white-space:nowrap;}
 
-  /* ---------- MIX 表格：手機版改為直式紀錄卡（僅 ≤640px，桌機版外觀不變） ----------
-     每個 tr 變成一張半透明深藍黑閱讀卡（沿用 .card 同一套視覺語言，但不強烈 glow）；
-     thead 隱藏，每個 td 用 ::before + data-label 顯示欄位名稱；不做橫向捲動。 */
+  /* ---------- MIX 卡片：手機維持單欄與足夠閱讀留白 ---------- */
   @media (max-width:640px){
-    .mix-table-wrap{overflow-x:visible;}
-    .mix-table{min-width:0;table-layout:auto;}
-    .mix-table thead{
-      position:absolute;width:1px;height:1px;padding:0;margin:-1px;
-      overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
-    }
-    .mix-table, .mix-table tbody, .mix-table tr, .mix-table td{display:block;width:100%;}
-    .mix-table tr{
-      background:rgba(8,7,18,0.46);
-      border:1px solid rgba(255,255,255,0.05);
-      border-radius:12px;
-      padding:14px 16px;
-      margin-bottom:14px;
-      box-shadow:0 6px 16px -16px rgba(0,0,0,0.3);
-    }
-    .mix-table tr:last-child{margin-bottom:0;}
-    .mix-table tbody td{
-      padding:8px 0;border-bottom:1px dashed var(--line-soft);
-      white-space:normal;word-break:break-word;overflow-wrap:anywhere;
-    }
-    .mix-table tbody td:first-child{padding-top:0;}
-    .mix-table tbody td:last-child{padding-bottom:0;border-bottom:none;}
-    .mix-table td.mix-time{white-space:normal;}
-    .mix-table td::before{
-      content:attr(data-label);
-      display:block;margin:0 0 4px;
-      font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;
-      color:var(--wood);opacity:.9;
-    }
-    .mix-stage-badge{
-      display:inline-block;
-      font-family:'Noto Sans TC',sans-serif;font-weight:700;font-size:12.5px;
-      color:var(--wood-deep);
-      background:rgba(203,174,115,0.12);
-      border:1px solid rgba(203,174,115,0.35);
-      border-radius:100px;
-      padding:4px 12px;
-    }
+    .mix-card{padding:18px 12px;}
+    .mix-records{gap:18px;}
+    .mix-record{padding:20px 16px;}
+    .mix-record-head{gap:12px;}
+    .mix-stage-badge{font-size:12px;padding:4px 9px;}
     .mix-pagination{gap:10px;}
     .mix-page-btn{padding:7px 12px;font-size:12.5px;}
     .mix-page-info{font-size:11.5px;}
@@ -1194,26 +1169,8 @@
       <button class="act btn-primary mix-add-btn" id="mixAddBtn">＋ 新增紀錄</button>
     </div>
     <div class="card mix-card">
-      <div class="mix-table-wrap">
-        <table class="mix-table" id="mixTable">
-          <colgroup>
-            <col style="width:120px">
-            <col style="width:22%">
-            <col style="width:16%">
-            <col style="width:28%">
-            <col style="width:16%">
-          </colgroup>
-          <thead>
-            <tr>
-              <th>日期時間</th>
-              <th>觀測問題</th>
-              <th>MIX 組成</th>
-              <th>MIX 交集結論</th>
-              <th>進度階段</th>
-            </tr>
-          </thead>
-          <tbody id="mixTableBody"></tbody>
-        </table>
+      <div>
+        <div class="mix-records" id="mixRecords" aria-label="MIX 觀測紀錄"></div>
         <p class="mix-empty" id="mixEmpty">尚無 MIX 觀測紀錄，點右上角「＋ 新增紀錄」開始記錄。</p>
       </div>
 
@@ -1929,26 +1886,81 @@
     return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  function renderMixTable(){
-    const body = document.getElementById('mixTableBody');
+  function renderMixStageBadges(stage){
+    return String(stage ?? '').split('｜').map(s => s.trim()).filter(Boolean).map(label => {
+      // 英文字母需位於開頭，後接數字、圈號、分隔符或結尾，避免誤認一般舊文字。
+      const axis = label.match(/^(心理|行動|互動|關係)/)?.[1]
+        || label.match(/^([PAFR])(?=\s|[0-9①-⑳０-９:：｜·-]|$)/i)?.[1]?.toUpperCase();
+      const tone = ({心理:'p', P:'p', 行動:'a', A:'a', 互動:'f', F:'f', 關係:'r', R:'r'})[axis] || 'a';
+      return `<span class="mix-stage-badge mix-stage-${tone}">${escapeHtml(label)}</span>`;
+    }).join('');
+  }
+
+  function mixReadingBlock(value, kind, index){
+    const question = kind === 'question';
+    const id = `mix-${kind}-${index}`;
+    return `<section class="mix-reading mix-${kind}">
+      <h3>${question ? 'OBSERVATION QUESTION · 觀測問題' : 'MIX CONCLUSION · 交集結論'}</h3>
+      <div class="mix-copy" id="${id}">${escapeHtml(String(value ?? ''))}</div>
+      <button type="button" class="mix-expand" aria-expanded="false" aria-controls="${id}" hidden>${question ? '展開問題' : '展開全文'}</button>
+    </section>`;
+  }
+
+  function syncMixToggles(){
+    document.querySelectorAll('#mixRecords .mix-copy').forEach(copy => {
+      if(!copy.getClientRects().length) return; // 隱藏分頁待顯示後再量測。
+      const button = copy.nextElementSibling;
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      copy.classList.remove('is-expanded');
+      const overflowing = copy.scrollHeight > copy.clientHeight + 1;
+      copy.classList.toggle('is-expanded', expanded);
+      button.hidden = !overflowing;
+    });
+  }
+
+  const mixRecords = document.getElementById('mixRecords');
+  mixRecords.addEventListener('click', event => {
+    const button = event.target.closest('.mix-expand');
+    if(!button) return;
+    const expanded = button.getAttribute('aria-expanded') !== 'true';
+    const copy = document.getElementById(button.getAttribute('aria-controls'));
+    copy.classList.toggle('is-expanded', expanded);
+    button.setAttribute('aria-expanded', String(expanded));
+    button.textContent = copy.closest('.mix-question')
+      ? (expanded ? '收合問題' : '展開問題') : (expanded ? '收合內容' : '展開全文');
+  });
+  let mixMeasureFrame;
+  function scheduleMixMeasurement(){
+    cancelAnimationFrame(mixMeasureFrame);
+    mixMeasureFrame = requestAnimationFrame(syncMixToggles);
+  }
+  if(typeof ResizeObserver !== 'undefined') new ResizeObserver(scheduleMixMeasurement).observe(mixRecords);
+  window.addEventListener('resize', scheduleMixMeasurement);
+  if(document.fonts) document.fonts.ready.then(scheduleMixMeasurement);
+
+  function renderMixCards(){
+    const body = mixRecords;
     const empty = document.getElementById('mixEmpty');
-    const table = document.getElementById('mixTable');
     if(mixPageEntries.length === 0){
-      table.style.display = 'none';
+      body.innerHTML = '';
       empty.style.display = 'block';
       return;
     }
-    table.style.display = '';
     empty.style.display = 'none';
-    body.innerHTML = mixPageEntries.map(e => `
-      <tr>
-        <td class="mix-time" data-label="日期時間">${formatMixTime(e.observed_at)}</td>
-        <td data-label="觀測問題">${escapeHtml(e.question)}</td>
-        <td data-label="MIX 組成">${escapeHtml(e.mix_components)}</td>
-        <td data-label="MIX 交集結論">${escapeHtml(e.conclusion)}</td>
-        <td class="mix-stage" data-label="進度階段"><span class="mix-stage-badge">${escapeHtml(e.stage)}</span></td>
-      </tr>
-    `).join('');
+    body.innerHTML = mixPageEntries.map((e, index) => {
+      const [date = '', time = ''] = formatMixTime(e.observed_at).split(' ');
+      const components = String(e.mix_components ?? '').split(/[＋+、,，｜|／/]/).map(s => s.trim()).filter(Boolean);
+      return `<article class="mix-record" aria-label="${escapeHtml(date + ' ' + time)} MIX 觀測紀錄">
+        <header class="mix-record-head">
+          <div class="mix-record-time"><span>${escapeHtml(date)}</span><span>${escapeHtml(time)}</span></div>
+          <div class="mix-stages">${renderMixStageBadges(e.stage)}</div>
+        </header>
+        ${components.length ? `<div class="mix-components" aria-label="MIX 組成">${components.map(s => `<span class="mix-component">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
+        ${mixReadingBlock(e.question, 'question', index)}
+        ${mixReadingBlock(e.conclusion, 'conclusion', index)}
+      </article>`;
+    }).join('');
+    scheduleMixMeasurement();
   }
 
   // 分頁列文字／按鈕狀態；只有超過 1 頁才顯示整組控制項
@@ -2015,7 +2027,7 @@
       statusEl.textContent = '資料庫連線失敗，請確認 mix_observations 這張表已建立且 Policy 已開放。';
     }finally{
       mixPageLoading = false;
-      renderMixTable();
+      renderMixCards();
       renderMixPagination();
     }
 
@@ -2123,6 +2135,7 @@
     panels.forEach(p=>p.classList.remove('active'));
     targetBtn.classList.add('active'); targetBtn.setAttribute('aria-selected','true');
     targetPanel.classList.add('active');
+    if(tabName === 'log') scheduleMixMeasurement();
     if(tabName === 'progress') syncStageTrajectoryToggles();
     if(scroll) window.scrollTo({top:0, behavior:'smooth'});
     return true;
