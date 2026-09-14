@@ -571,12 +571,13 @@
   .quote-card .q-meta{font-family:'Space Mono',monospace;font-size:12.5px;color:#B4A9EA;}
 
   /* ---------- MIX ---------- */
-  .mix-card{padding:22px 24px;}
+  .mix-card{padding:0;max-width:880px;margin:0 auto;}
   .mix-add-btn{padding:9px 18px;font-size:13.5px;box-shadow:none;}
-  .mix-records{display:grid;gap:22px;max-width:880px;margin:0 auto;}
-  .mix-record{padding:24px 28px;background:rgba(8,10,24,.58);border:1px solid rgba(180,169,234,.13);border-radius:14px;min-width:0;}
-  .mix-record-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
-  .mix-record-time{display:flex;flex-direction:column;gap:4px;flex-shrink:0;font-family:'Space Mono',monospace;font-size:12px;color:var(--ink-soft);}
+  .mix-records{display:grid;gap:18px;max-width:880px;margin:0 auto;}
+  .mix-record{padding:22px 28px;background:rgba(8,10,24,.58);border:1px solid rgba(180,169,234,.13);border-radius:14px;min-width:0;}
+  /* 卡片標頭不使用全站 header 的 64px 頂部與 20px 底部留白。 */
+  .mix-record-head{padding:0;overflow:visible;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+  .mix-record-time{white-space:nowrap;flex-shrink:0;font-family:'Space Mono',monospace;font-size:12px;color:var(--ink-soft);line-height:1.8;}
   .mix-stages{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;min-width:0;}
   .mix-stage-badge{display:inline-block;max-width:100%;overflow-wrap:anywhere;border-radius:100px;padding:5px 12px;font-size:13px;font-weight:700;line-height:1.6;}
   .mix-stage-a{color:var(--wood-deep);background:rgba(203,174,115,.12);border:1px solid rgba(203,174,115,.35);}
@@ -585,11 +586,11 @@
   .mix-stage-r{color:#d6b7d1;background:rgba(189,148,180,.12);border:1px solid rgba(189,148,180,.28);}
   .mix-components{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
   .mix-component{font-size:12px;line-height:1.5;color:var(--ink-soft);background:rgba(180,169,234,.06);border:1px solid rgba(180,169,234,.12);border-radius:6px;padding:3px 8px;overflow-wrap:anywhere;max-width:100%;}
-  .mix-reading{margin-top:20px;}
+  .mix-reading{margin-top:14px;}
   .mix-reading h3{font-family:'Space Mono','Noto Sans TC',monospace;font-size:11px;font-weight:400;letter-spacing:.06em;color:#b4a9d0;margin:0 0 8px;line-height:1.7;}
   .mix-copy{white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;}
   .mix-question .mix-copy{font-size:14px;line-height:1.8;color:#b9b5ca;-webkit-line-clamp:3;}
-  .mix-conclusion{padding-top:20px;border-top:1px solid rgba(203,174,115,.12);}
+  .mix-conclusion{padding-top:14px;border-top:1px solid rgba(203,174,115,.12);}
   .mix-conclusion h3{color:var(--wood);}
   .mix-conclusion .mix-copy{font-size:16px;line-height:1.9;color:#ece8f5;-webkit-line-clamp:4;}
   .mix-copy.is-expanded{display:block;-webkit-line-clamp:unset;overflow:visible;}
@@ -625,10 +626,10 @@
 
   /* ---------- MIX 卡片：手機維持單欄與足夠閱讀留白 ---------- */
   @media (max-width:640px){
-    .mix-card{padding:18px 12px;}
-    .mix-records{gap:18px;}
     .mix-record{padding:20px 16px;}
-    .mix-record-head{gap:12px;}
+    .mix-record-head{flex-direction:column;gap:10px;}
+    .mix-stages{width:100%;justify-content:flex-start;}
+    .mix-stages:empty{display:none;}
     .mix-stage-badge{font-size:12px;padding:4px 9px;}
     .mix-pagination{gap:10px;}
     .mix-page-btn{padding:7px 12px;font-size:12.5px;}
@@ -1168,7 +1169,7 @@
       <span class="num mono">01 · C</span><h2>🔮 MIX 龜龜觀測站</h2><div class="rule"></div>
       <button class="act btn-primary mix-add-btn" id="mixAddBtn">＋ 新增紀錄</button>
     </div>
-    <div class="card mix-card">
+    <div class="mix-card">
       <div>
         <div class="mix-records" id="mixRecords" aria-label="MIX 觀測紀錄"></div>
         <p class="mix-empty" id="mixEmpty">尚無 MIX 觀測紀錄，點右上角「＋ 新增紀錄」開始記錄。</p>
@@ -1948,11 +1949,11 @@
     }
     empty.style.display = 'none';
     body.innerHTML = mixPageEntries.map((e, index) => {
-      const [date = '', time = ''] = formatMixTime(e.observed_at).split(' ');
+      const dateTime = formatMixTime(e.observed_at);
       const components = String(e.mix_components ?? '').split(/[＋+、,，｜|／/]/).map(s => s.trim()).filter(Boolean);
-      return `<article class="mix-record" aria-label="${escapeHtml(date + ' ' + time)} MIX 觀測紀錄">
+      return `<article class="mix-record" aria-label="${escapeHtml(dateTime)} MIX 觀測紀錄">
         <header class="mix-record-head">
-          <div class="mix-record-time"><span>${escapeHtml(date)}</span><span>${escapeHtml(time)}</span></div>
+          <div class="mix-record-time">${escapeHtml(dateTime)}</div>
           <div class="mix-stages">${renderMixStageBadges(e.stage)}</div>
         </header>
         ${components.length ? `<div class="mix-components" aria-label="MIX 組成">${components.map(s => `<span class="mix-component">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
