@@ -191,7 +191,7 @@
 
   .tabpanel{display:none;animation: fadein .35s ease;}
   .tabpanel.active{display:block;}
-  @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes fadein{from{opacity:0;}to{opacity:1;}}
 
   /* ---------- 回到頂端：全站共用，固定右下角 ----------
      捲動超過門檻才淡入／接近頂端時隱藏；深午夜藍紫半透明底＋細暖金邊框，不做強烈 glow。 */
@@ -366,7 +366,16 @@
   .stage-detail p{margin:0;color:var(--ink-soft);font-size:14px;}
 
   /* ---------- 02·A 目前觀測階段（以 mix_observations.stage 六階段為主要資料來源） ---------- */
-  .stage-overview-card{padding:24px 22px 22px;}
+  .stage-overview-card{padding:26px 24px 24px;min-height:188px;}
+  .stage-phase-switch{display:flex;gap:8px;margin:0 0 18px;}
+  .stage-phase-btn{flex:1;min-height:44px;padding:9px 14px;border:1px solid var(--line-soft);border-radius:10px;background:rgba(8,7,18,.38);color:var(--ink-soft);font:700 13px 'Noto Sans TC',sans-serif;cursor:pointer;}
+  .stage-phase-btn.is-active{color:var(--wood-deep);border-color:rgba(203,174,115,.45);background:rgba(203,174,115,.11);}
+  .stage-phase-note{margin:-8px 0 18px;font-size:12px;color:var(--ink-soft);}
+  .stage-axis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  .stage-axis-card{min-width:0;padding:16px;border:1px solid var(--line-soft);border-radius:12px;background:rgba(8,7,18,.36);}
+  .stage-axis-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--wood);letter-spacing:.08em;}
+  .stage-axis-value{margin-top:7px;font-family:'Noto Serif TC',serif;font-size:18px;font-weight:700;color:var(--ink);overflow-wrap:anywhere;}
+  .stage-axis-empty{margin-top:7px;font-size:13px;color:var(--ink-soft);}
   .stage-hero{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
   .stage-hero-num{
     font-family:'Space Mono',monospace;font-size:42px;font-weight:700;color:var(--wood-deep);
@@ -376,6 +385,15 @@
   .stage-hero-name{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:700;color:var(--ink);}
   .stage-hero-time{font-size:12px;color:var(--ink-soft);margin-top:4px;}
   .stage-hero-desc{margin:16px 0 0;color:var(--ink-soft);font-size:14.5px;line-height:1.6;}
+  .stage-position{font-family:'Space Mono',monospace;font-size:12px;color:var(--wood);margin-bottom:5px;}
+  .stage-progress{margin-top:20px;}
+  .stage-progress-meta{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:11.5px;color:var(--ink-soft);}
+  .stage-progress-rail{position:relative;height:6px;border-radius:100px;background:rgba(183,178,222,.13);overflow:hidden;}
+  .stage-progress-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#8A6E36,var(--wood-deep));}
+  .stage-progress-dots{display:grid;grid-template-columns:repeat(6,1fr);margin-top:8px;}
+  .stage-progress-dot{text-align:center;font-family:'Space Mono',monospace;font-size:10px;color:#77739a;}
+  .stage-progress-dot.is-reached{color:var(--wood);}
+  .stage-progress-dot.is-current{color:var(--wood-deep);font-weight:700;}
 
   .stage-change-tag{
     display:inline-flex;align-items:center;
@@ -392,7 +410,11 @@
   .stage-empty-hint{margin:0;font-size:13px;line-height:1.6;}
 
   /* ---------- 02·B 階段軌跡 ---------- */
-  .stage-trajectory-card{padding:20px 20px 18px;}
+  .stage-trajectory-card{padding:22px 20px 20px;min-height:220px;}
+  .stage-trend-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin:0 0 22px;background:rgba(255,255,255,.06);border:1px solid var(--line-soft);border-radius:10px;overflow:hidden;}
+  .stage-trend-stat{padding:11px 8px;text-align:center;background:rgba(8,7,18,.66);}
+  .stage-trend-stat .v{display:block;font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--ink);}
+  .stage-trend-stat .k{display:block;margin-top:2px;font-size:11px;color:var(--ink-soft);}
   .stage-mini-track{
     display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;
     padding:0 0 8px;margin-bottom:14px;
@@ -413,6 +435,9 @@
   }
   .stage-tl-empty{margin:0;padding:10px 2px;color:var(--ink-soft);font-size:13.5px;}
   .stage-tl-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:4px;}
+  .stage-tl-axes{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px;}
+  .stage-axis-badge{display:inline-flex;align-items:center;padding:5px 10px;border:1px solid var(--line-soft);border-radius:100px;font-size:13px;color:var(--ink);background:rgba(183,178,222,.08);}
+  .stage-axis-badge b{margin-right:5px;color:var(--wood);}
   .stage-tl-stage{font-family:'Noto Serif TC',serif;font-size:18px;font-weight:700;color:var(--ink);}
   .stage-trajectory-card .tl-time{font-size:15px;}
   .stage-trajectory-card .stage-change-tag{font-size:14px;}
@@ -428,8 +453,19 @@
   .stage-tl-toggle:hover{color:var(--wood-deep);text-decoration:underline;}
   .stage-tl-toggle[hidden]{display:none;}
 
+  .stage-loading{display:grid;gap:13px;padding:4px 0;}
+  .stage-loading-line{height:14px;border-radius:6px;background:linear-gradient(90deg,rgba(183,178,222,.07),rgba(183,178,222,.15),rgba(183,178,222,.07));background-size:200% 100%;animation:stageShimmer 1.4s linear infinite;}
+  .stage-loading-line.wide{width:68%;height:30px;}.stage-loading-line.mid{width:48%;}.stage-loading-line.short{width:32%;}
+  @keyframes stageShimmer{to{background-position:-200% 0;}}
+
   @media (max-width:640px){
-    .stage-mini-track{display:none;}
+    .stage-overview-card{padding:22px 18px 20px;}
+    .stage-axis-grid{grid-template-columns:1fr;}
+    .stage-hero{align-items:flex-start;}
+    .stage-change-tag{margin-left:50px;}
+    .stage-mini-track{display:flex;overflow-x:auto;scroll-snap-type:x proximity;gap:0;padding-bottom:10px;overscroll-behavior-inline:contain;scrollbar-width:thin;}
+    .stage-mini-item{flex:0 0 112px;scroll-snap-align:center;}
+    .stage-trend-summary{grid-template-columns:repeat(2,1fr);}
     .stage-hero-num{font-size:34px;}
     .stage-hero-name{font-size:19px;}
   }
@@ -1046,13 +1082,13 @@
   <section class="tabpanel" id="tab-progress">
 
     <div class="section-label" style="margin-top:22px;"><span class="num mono">02 · A</span><h2>🐢 龜龜目前觀測階段</h2><div class="rule"></div></div>
-    <div class="card stage-overview-card" id="stageOverview">
-      <!-- 由 renderStageOverview() 依 mixLatestEntries（MIX 六階段資料）動態產生，避免與舊版十階段模型並存造成混淆 -->
+    <div class="card stage-overview-card" id="stageOverview" aria-live="polite" aria-busy="true">
+      <div class="stage-loading" aria-label="正在讀取目前觀測階段"><span class="stage-loading-line wide"></span><span class="stage-loading-line mid"></span><span class="stage-loading-line"></span></div>
     </div>
 
     <div class="section-label"><span class="num mono">02 · B</span><h2>📈 階段軌跡</h2><div class="rule"></div></div>
-    <div class="card stage-trajectory-card" id="stageTrajectory">
-      <!-- 由 renderStageTrajectory() 依 mixLatestEntries 動態產生 -->
+    <div class="card stage-trajectory-card" id="stageTrajectory" aria-live="polite" aria-busy="true">
+      <div class="stage-loading" aria-label="正在讀取階段軌跡"><span class="stage-loading-line wide"></span><span class="stage-loading-line"></span><span class="stage-loading-line mid"></span><span class="stage-loading-line"></span></div>
     </div>
 
     <div class="section-label"><span class="num mono">02 · C</span><h2>🐢 龜龜今日行為統計</h2><div class="rule"></div></div>
@@ -1517,17 +1553,40 @@
     return `${d.getMonth()+1}/${d.getDate()}`;
   }
 
-  // 階段對照表：支援舊版圈數字與心理／行動標記；雙軸紀錄優先採用行動階段。
+  // 四軸階段：心理／行動屬於重新接觸前，互動／關係屬於重新接觸後。
+  // 單一圈號格式保留為舊版綜合階段，不改寫既有資料。
   const STAGE_ORDER = ['①','②','③','④','⑤','⑥'];
+  const STAGE_AXES = {
+    pre:  { label:'重新接觸前', axes:['心理','行動'] },
+    post: { label:'重新接觸後', axes:['互動','關係'] }
+  };
+  const STAGE_AXIS_ALIAS = { P:'心理', A:'行動', F:'互動', R:'關係' };
+  let selectedStagePhase = null;
+
+  function parseStageParts(stageStr){
+    if(typeof stageStr !== 'string') return [];
+    return stageStr.split('｜').map(raw=>raw.trim()).filter(Boolean).map(raw=>{
+      const match = raw.match(/^(心理|行動|互動|關係|P|A|F|R)\s*[:：]?\s*([①②③④⑤⑥])/i);
+      if(match){
+        const alias = match[1].toUpperCase();
+        return { axis:STAGE_AXIS_ALIAS[alias] || match[1], idx:STAGE_ORDER.indexOf(match[2]), label:raw };
+      }
+      const legacy = raw.match(/^([①②③④⑤⑥])/);
+      return legacy ? { axis:'舊版綜合', idx:STAGE_ORDER.indexOf(legacy[1]), label:raw } : null;
+    }).filter(Boolean);
+  }
+  function stagePhaseOf(entry){
+    const parts = parseStageParts(entry && entry.stage);
+    if(parts.some(p=>p.axis==='互動' || p.axis==='關係')) return 'post';
+    if(parts.length) return 'pre';
+    return null;
+  }
   function stageIndexOf(stageStr){
-    if(typeof stageStr !== 'string') return null;
-    const value = stageStr.trim();
-    const action = value.match(/(?:^|[；;｜|，,\s])行動\s*([①②③④⑤⑥])/);
-    const legacy = value.match(/^([①②③④⑤⑥])/);
-    const mind = value.match(/^心理\s*([①②③④⑤⑥])/);
-    const match = action || legacy || mind;
-    const idx = match ? STAGE_ORDER.indexOf(match[1]) : -1;
-    return idx === -1 ? null : idx;
+    const parts = parseStageParts(stageStr);
+    // 舊有 Dashboard 邏輯維持只讀重新接觸前的行動／綜合／心理階段；
+    // 02 的四軸顯示直接使用 parseStageParts，不改變首頁既有行為。
+    const preferred = parts.find(p=>p.axis==='行動') || parts.find(p=>p.axis==='舊版綜合') || parts.find(p=>p.axis==='心理');
+    return preferred ? preferred.idx : null;
   }
 
   // ---------- 02·A／02·B：以 mix_observations.stage 六階段為主要資料來源 ----------
@@ -1546,7 +1605,7 @@
   }
   // 只保留 stage 欄位可辨識的紀錄；忽略空值／格式無法辨識的紀錄。
   function validMixEntries(){
-    return (typeof mixLatestEntries !== 'undefined' ? mixLatestEntries : []).filter(e => stageIndexOf(e.stage) !== null);
+    return (typeof mixLatestEntries !== 'undefined' ? mixLatestEntries : []).filter(e => parseStageParts(e.stage).length > 0);
   }
   // 比較「目前」與「前一筆」的六階段索引，回傳狀態類型與顯示文字
   function stageChangeLabel(curIdx, prevIdx, noPrevLabel){
@@ -1562,6 +1621,7 @@
   function renderStageOverview(){
     const container = document.getElementById('stageOverview');
     if(!container) return;
+    container.setAttribute('aria-busy','false');
     const valid = validMixEntries();
     if(valid.length === 0){
       container.innerHTML = `
@@ -1571,59 +1631,90 @@
         </div>`;
       return;
     }
-    const latest = valid[0];
-    const prev = valid.length > 1 ? valid[1] : null;
-    const curIdx = stageIndexOf(latest.stage);
-    const prevIdx = prev ? stageIndexOf(prev.stage) : null;
-    const change = stageChangeLabel(curIdx, prevIdx);
-    container.innerHTML = `
-      <div class="stage-hero">
-        <div class="stage-hero-num mono">${STAGE_ORDER[curIdx]}</div>
-        <div class="stage-hero-body">
-          <div class="stage-hero-name">${STAGE_NAMES[curIdx]}</div>
-          <div class="stage-hero-time mono">最新觀測時間：${formatMixTime(latest.observed_at)}</div>
-        </div>
+    if(!selectedStagePhase) selectedStagePhase = stagePhaseOf(valid[0]) || 'pre';
+    const phaseEntries = valid.filter(e=>stagePhaseOf(e)===selectedStagePhase);
+    const latest = phaseEntries[0];
+    const phase = STAGE_AXES[selectedStagePhase];
+    const switchHtml = `<div class="stage-phase-switch" role="group" aria-label="觀測時期">
+      ${Object.entries(STAGE_AXES).map(([key,item])=>`<button type="button" class="stage-phase-btn${key===selectedStagePhase?' is-active':''}" data-stage-phase="${key}" aria-pressed="${key===selectedStagePhase}">${item.label}</button>`).join('')}
+    </div>`;
+    if(!latest){
+      container.innerHTML = switchHtml + `<div class="stage-empty"><p class="stage-empty-title">${phase.label}尚無階段資料</p><p class="stage-empty-hint">切換另一個時期可查看目前已有的觀測紀錄。</p></div>`;
+      bindStagePhaseButtons(container);
+      return;
+    }
+    const parts = parseStageParts(latest.stage);
+    const legacy = parts.find(p=>p.axis==='舊版綜合');
+    const axes = legacy ? ['舊版綜合'] : phase.axes;
+    const axisCards = axes.map(axis=>{
+      const part = parts.find(p=>p.axis===axis);
+      if(!part) return `<div class="stage-axis-card"><div class="stage-axis-label">${axis}</div><div class="stage-axis-empty">本次未提供此軸資料</div></div>`;
+      const previousPart = phaseEntries.slice(1).map(e=>parseStageParts(e.stage).find(p=>p.axis===axis)).find(Boolean);
+      const change = stageChangeLabel(part.idx, previousPart ? previousPart.idx : null);
+      return `<div class="stage-axis-card">
+        <div class="stage-axis-label">${axis}</div>
+        <div class="stage-axis-value">${escapeHtml(part.label.replace(/^(心理|行動|互動|關係|P|A|F|R)\s*[:：]?\s*/i,''))}</div>
         <span class="stage-change-tag stage-change-${change.type}">${change.label}</span>
-      </div>
-      <p class="stage-hero-desc">${escapeHtml(STAGE_ONE_LINERS[curIdx])}</p>
+        <div class="stage-progress" role="img" aria-label="${axis}為第 ${part.idx+1} 階">
+          <div class="stage-progress-rail"><div class="stage-progress-fill" style="width:${((part.idx+1)/6)*100}%"></div></div>
+          <div class="stage-progress-dots">${STAGE_ORDER.map((n,i)=>`<span class="stage-progress-dot${i<=part.idx?' is-reached':''}${i===part.idx?' is-current':''}">${n}</span>`).join('')}</div>
+        </div>
+      </div>`;
+    }).join('');
+    container.innerHTML = `
+      ${switchHtml}
+      <p class="stage-phase-note">${phase.label} · 最新觀測時間：${formatMixTime(latest.observed_at)}${legacy?' · 舊版單軸資料':''}</p>
+      <div class="stage-axis-grid">${axisCards}</div>
     `;
+    bindStagePhaseButtons(container);
+  }
+
+  function bindStagePhaseButtons(container){
+    container.querySelectorAll('[data-stage-phase]').forEach(btn=>btn.addEventListener('click',()=>{
+      selectedStagePhase = btn.dataset.stagePhase;
+      renderStageOverview();
+      renderStageTrajectory();
+    }));
   }
 
   // 02·B：階段軌跡——最近 10 筆有效 MIX 紀錄，由新到舊排列，保留連續重複階段（不去重）
   function renderStageTrajectory(){
     const container = document.getElementById('stageTrajectory');
     if(!container) return;
-    const valid = validMixEntries(); // 新→舊
+    container.setAttribute('aria-busy','false');
+    const allValid = validMixEntries(); // 新→舊
+    if(!selectedStagePhase && allValid.length) selectedStagePhase = stagePhaseOf(allValid[0]) || 'pre';
+    const valid = allValid.filter(e=>stagePhaseOf(e)===selectedStagePhase);
     if(valid.length === 0){
       container.innerHTML = `<p class="stage-tl-empty">尚無可用的 MIX 觀測資料，暫無階段軌跡可顯示。</p>`;
       return;
     }
-    const reachedSet = new Set(valid.map(e => stageIndexOf(e.stage)));
-    const curIdx = stageIndexOf(valid[0].stage);
-    const trackHtml = `
-      <div class="stage-mini-track" aria-hidden="true">
-        ${STAGE_ORDER.map((num,i)=>`
-          <div class="stage-mini-item${i===curIdx?' is-current':''}${reachedSet.has(i)?' is-reached':''}">
-            <div class="num">${num}</div>
-            <div class="nm">${STAGE_NAMES[i]}</div>
-          </div>
-        `).join('')}
+    const phase = STAGE_AXES[selectedStagePhase];
+    let upCount = 0, sameCount = 0, downCount = 0;
+    const axesToCompare = selectedStagePhase==='pre' ? ['心理','行動','舊版綜合'] : phase.axes;
+    axesToCompare.forEach(axis=>{
+      const values = valid.map(e=>parseStageParts(e.stage).find(p=>p.axis===axis)).filter(Boolean);
+      for(let i=0;i<values.length-1;i++){
+        if(values[i].idx > values[i+1].idx) upCount++;
+        else if(values[i].idx < values[i+1].idx) downCount++;
+        else sameCount++;
+      }
+    });
+    const summaryHtml = `
+      <div class="stage-trend-summary" aria-label="最近 ${valid.length} 筆觀測變化摘要">
+        <div class="stage-trend-stat"><span class="v">${valid.length}</span><span class="k">近期觀測</span></div>
+        <div class="stage-trend-stat"><span class="v">${upCount}</span><span class="k">前進</span></div>
+        <div class="stage-trend-stat"><span class="v">${sameCount}</span><span class="k">維持</span></div>
+        <div class="stage-trend-stat"><span class="v">${downCount}</span><span class="k">回落</span></div>
       </div>`;
-
     const listHtml = valid.map((e, i)=>{
-      const idx = stageIndexOf(e.stage);
-      const prevEntry = valid[i + 1] || null; // 與時間較早的前一次觀測比較
-      const prevIdx = prevEntry ? stageIndexOf(prevEntry.stage) : null;
-      const change = prevEntry ? stageChangeLabel(idx, prevIdx) : { type:'none', label:'本區間最早紀錄' };
+      const parts = parseStageParts(e.stage).filter(p=>axesToCompare.includes(p.axis));
       const conclusion = e.conclusion ? escapeHtml(e.conclusion) : '';
       const entryId = `stageTl${i}`;
       return `
         <div class="tl-entry">
           <div class="tl-time">${formatMixTime(e.observed_at)}</div>
-          <div class="stage-tl-row">
-            <span class="stage-tl-stage">${stageFullLabel(idx)}</span>
-            <span class="stage-change-tag stage-change-${change.type}">${change.label}</span>
-          </div>
+          <div class="stage-tl-axes">${parts.map(p=>`<span class="stage-axis-badge"><b>${p.axis}</b>${escapeHtml(p.label.replace(/^(心理|行動|互動|關係|P|A|F|R)\s*[:：]?\s*/i,''))}</span>`).join('')}</div>
           ${conclusion ? `
           <div class="tl-body">
             <p class="stage-tl-conclusion" id="${entryId}">${conclusion}</p>
@@ -1632,7 +1723,7 @@
         </div>`;
     }).join('');
 
-    container.innerHTML = trackHtml + `<div class="timeline">${listHtml}</div>`;
+    container.innerHTML = `<p class="stage-phase-note">${phase.label} · 最近 ${valid.length} 筆有效紀錄；變化僅在相同軸之間比較。</p>` + summaryHtml + `<div class="timeline" aria-label="${phase.label}最近 ${valid.length} 筆階段紀錄">${listHtml}</div>`;
 
     container.querySelectorAll('.stage-tl-toggle').forEach(btn=>{
       btn.addEventListener('click', ()=>{
@@ -2026,6 +2117,12 @@
     }catch(err){
       // 失敗時保留目前畫面內容，不清空既有表格／分頁，只更新狀態文字
       statusEl.textContent = '資料庫連線失敗，請確認 mix_observations 這張表已建立且 Policy 已開放。';
+      ['stageOverview','stageTrajectory'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.setAttribute('aria-busy','false');
+        el.innerHTML = `<div class="stage-empty"><p class="stage-empty-title">暫時無法讀取觀測階段</p><p class="stage-empty-hint">資料連線失敗，稍後重新整理頁面即可再次嘗試。</p></div>`;
+      });
     }finally{
       mixPageLoading = false;
       renderMixCards();
@@ -2138,7 +2235,7 @@
     targetPanel.classList.add('active');
     if(tabName === 'log') scheduleMixMeasurement();
     if(tabName === 'progress') syncStageTrajectoryToggles();
-    if(scroll) window.scrollTo({top:0, behavior:'smooth'});
+    if(scroll) window.scrollTo({top:0, behavior:'instant'});
     return true;
   }
 
@@ -2395,8 +2492,6 @@
 
   // ---------- init ----------
   updateStageBlock();
-  renderStageOverview();
-  renderStageTrajectory();
   loadWearState();
   renderWearUI();
   maybeShowResignEgg();
