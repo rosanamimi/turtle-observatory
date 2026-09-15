@@ -367,9 +367,6 @@
 
   /* ---------- 02·A 目前觀測階段（以 mix_observations.stage 六階段為主要資料來源） ---------- */
   .stage-overview-card{padding:26px 24px 24px;min-height:188px;}
-  .stage-phase-switch{display:flex;gap:8px;margin:0 0 18px;}
-  .stage-phase-btn{flex:1;min-height:44px;padding:9px 14px;border:1px solid var(--line-soft);border-radius:10px;background:rgba(8,7,18,.38);color:var(--ink-soft);font:700 13px 'Noto Sans TC',sans-serif;cursor:pointer;}
-  .stage-phase-btn.is-active{color:var(--wood-deep);border-color:rgba(203,174,115,.45);background:rgba(203,174,115,.11);}
   .stage-phase-note{margin:-8px 0 18px;font-size:12px;color:var(--ink-soft);}
   .stage-verdict{margin:0 0 18px;padding:16px 18px;border-left:2px solid var(--wood-deep);background:rgba(203,174,115,.06);font-family:'Noto Serif TC',serif;font-size:17px;font-weight:700;line-height:1.75;color:var(--ink);}
   .stage-verdict small{display:block;margin-top:6px;font:400 11.5px 'Space Mono',monospace;color:var(--ink-soft);}
@@ -1591,7 +1588,7 @@
     post: { label:'重新接觸後', axes:['互動','關係'] }
   };
   const STAGE_AXIS_ALIAS = { P:'心理', A:'行動', F:'互動', R:'關係' };
-  let selectedStagePhase = null;
+  let selectedStagePhase = 'post';
 
   function parseStageParts(stageStr){
     if(typeof stageStr !== 'string') return [];
@@ -1693,16 +1690,11 @@
         </div>`;
       return;
     }
-    if(!selectedStagePhase) selectedStagePhase = stagePhaseOf(valid[0]) || 'pre';
     const phaseEntries = valid.filter(e=>stagePhaseOf(e)===selectedStagePhase);
     const latest = phaseEntries[0];
     const phase = STAGE_AXES[selectedStagePhase];
-    const switchHtml = `<div class="stage-phase-switch" role="group" aria-label="觀測時期">
-      ${Object.entries(STAGE_AXES).map(([key,item])=>`<button type="button" class="stage-phase-btn${key===selectedStagePhase?' is-active':''}" data-stage-phase="${key}" aria-pressed="${key===selectedStagePhase}">${item.label}（${valid.filter(e=>stagePhaseOf(e)===key).length}）</button>`).join('')}
-    </div>`;
     if(!latest){
-      container.innerHTML = switchHtml + `<div class="stage-empty"><p class="stage-empty-title">${phase.label}尚無階段資料</p><p class="stage-empty-hint">切換另一個時期可查看目前已有的觀測紀錄。</p></div>`;
-      bindStagePhaseButtons(container);
+      container.innerHTML = `<div class="stage-empty"><p class="stage-empty-title">尚無聊天後的互動／關係階段資料</p><p class="stage-empty-hint">完整的接觸前紀錄仍可在 01 · C MIX 龜龜觀測站查看。</p></div>`;
       return;
     }
     const parts = parseStageParts(latest.stage);
@@ -1724,20 +1716,10 @@
       </div>`;
     }).join('');
     container.innerHTML = `
-      ${switchHtml}
-      <p class="stage-phase-note">${phase.label} · 最新觀測時間：${formatMixTime(latest.observed_at)}${legacy?' · 舊版單軸資料':''}</p>
+      <p class="stage-phase-note">斷斷續續聊天中 · 最新觀測時間：${formatMixTime(latest.observed_at)}</p>
       <div class="stage-verdict">${stageAbsurdVerdict(selectedStagePhase,parts)}<small>觀測所翻譯結果，原始階段資料如下</small></div>
       <div class="stage-axis-grid">${axisCards}</div>
     `;
-    bindStagePhaseButtons(container);
-  }
-
-  function bindStagePhaseButtons(container){
-    container.querySelectorAll('[data-stage-phase]').forEach(btn=>btn.addEventListener('click',()=>{
-      selectedStagePhase = btn.dataset.stagePhase;
-      renderStageOverview();
-      renderStageTrajectory();
-    }));
   }
 
   // 02·B：階段軌跡——最近 10 筆有效 MIX 紀錄，由新到舊排列，保留連續重複階段（不去重）
@@ -1746,7 +1728,6 @@
     if(!container) return;
     container.setAttribute('aria-busy','false');
     const allValid = validMixEntries(); // 新→舊
-    if(!selectedStagePhase && allValid.length) selectedStagePhase = stagePhaseOf(allValid[0]) || 'pre';
     const valid = allValid.filter(e=>stagePhaseOf(e)===selectedStagePhase);
     if(valid.length === 0){
       container.innerHTML = `<p class="stage-tl-empty">尚無可用的 MIX 觀測資料，暫無階段軌跡可顯示。</p>`;
