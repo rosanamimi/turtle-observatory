@@ -371,6 +371,9 @@
   .stage-phase-btn{flex:1;min-height:44px;padding:9px 14px;border:1px solid var(--line-soft);border-radius:10px;background:rgba(8,7,18,.38);color:var(--ink-soft);font:700 13px 'Noto Sans TC',sans-serif;cursor:pointer;}
   .stage-phase-btn.is-active{color:var(--wood-deep);border-color:rgba(203,174,115,.45);background:rgba(203,174,115,.11);}
   .stage-phase-note{margin:-8px 0 18px;font-size:12px;color:var(--ink-soft);}
+  .stage-verdict{margin:0 0 18px;padding:16px 18px;border-left:2px solid var(--wood-deep);background:rgba(203,174,115,.06);font-family:'Noto Serif TC',serif;font-size:17px;font-weight:700;line-height:1.75;color:var(--ink);}
+  .stage-verdict small{display:block;margin-top:6px;font:400 11.5px 'Space Mono',monospace;color:var(--ink-soft);}
+  .trajectory-verdict{margin:2px 0 18px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7;color:var(--ink);}
   .stage-axis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
   .stage-axis-card{min-width:0;padding:16px;border:1px solid var(--line-soft);border-radius:12px;background:rgba(8,7,18,.36);}
   .stage-axis-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--wood);letter-spacing:.08em;}
@@ -1103,39 +1106,39 @@
       <button type="button" class="progress-refresh" id="progressRefreshBtn">↻ 重新讀取觀測資料</button>
     </div>
 
-    <div class="section-label" style="margin-top:22px;"><span class="num mono">02 · A</span><h2>🐢 龜龜目前觀測階段</h2><div class="rule"></div></div>
+    <div class="section-label" style="margin-top:22px;"><span class="num mono">02 · A</span><h2>🐢 龜龜目前卡在哪裡</h2><div class="rule"></div></div>
     <div class="card stage-overview-card" id="stageOverview" aria-live="polite" aria-busy="true">
       <div class="stage-loading" aria-label="正在讀取目前觀測階段"><span class="stage-loading-line wide"></span><span class="stage-loading-line mid"></span><span class="stage-loading-line"></span></div>
     </div>
 
-    <div class="section-label"><span class="num mono">02 · B</span><h2>📈 階段軌跡</h2><div class="rule"></div></div>
-    <div class="card stage-trajectory-card" id="stageTrajectory" aria-live="polite" aria-busy="true">
-      <div class="stage-loading" aria-label="正在讀取階段軌跡"><span class="stage-loading-line wide"></span><span class="stage-loading-line"></span><span class="stage-loading-line mid"></span><span class="stage-loading-line"></span></div>
-    </div>
-
-    <div class="section-label"><span class="num mono">02 · C</span><h2>🐢 龜龜今日行為統計</h2><div class="rule"></div></div>
+    <div class="section-label"><span class="num mono">02 · B</span><h2>🔎 今日可疑行為</h2><div class="rule"></div></div>
     <div class="card" style="padding:0;overflow:hidden;">
       <p class="behavior-section-label" style="padding:16px 16px 0;">關鍵行動</p>
       <div class="behavior-primary">
-        <div class="beh-card"><div class="ic">📨</div><div class="lb">今日準備傳訊息</div><div class="n" id="behPrep">—</div></div>
-        <div class="beh-card zero" id="behPushCard"><div class="ic">🚪</div><div class="lb">累計送出訊息</div><div class="n" id="behPush">—</div></div>
-        <div class="beh-card zero" id="behOpenCard"><div class="ic">🎉</div><div class="lb">累計深入互動</div><div class="n" id="behOpen">—</div></div>
+        <div class="beh-card"><div class="ic">📨</div><div class="lb">訊息存在於精神世界</div><div class="n" id="behPrep">—</div></div>
+        <div class="beh-card zero" id="behPushCard"><div class="ic">🚪</div><div class="lb">奇蹟般送出訊息</div><div class="n" id="behPush">—</div></div>
+        <div class="beh-card zero" id="behOpenCard"><div class="ic">🎉</div><div class="lb">系統無法理解的進展</div><div class="n" id="behOpen">—</div></div>
       </div>
       <p class="behavior-section-label" style="padding:16px 16px 0;">今日其他行為</p>
       <div class="behavior-secondary">
-        <div class="beh-card"><div class="ic">👀</div><div class="lb">偷看門</div><div class="n" id="behPeek">—</div></div>
-        <div class="beh-card"><div class="ic">🚶</div><div class="lb">靠近門</div><div class="n" id="behApproach">—</div></div>
-        <div class="beh-card"><div class="ic">🖐️</div><div class="lb">摸／研究門把</div><div class="n" id="behTouch">—</div></div>
-        <div class="beh-card"><div class="ic">🧠</div><div class="lb">研究方式</div><div class="n" id="behResearch">—</div></div>
-        <div class="beh-card"><div class="ic">↩️</div><div class="lb">突然退回</div><div class="n" id="behRetreat">—</div></div>
-        <div class="beh-card"><div class="ic">🐚</div><div class="lb">縮進殼裡</div><div class="n" id="behShell">—</div></div>
+        <div class="beh-card"><div class="ic">👀</div><div class="lb">假裝路過門口</div><div class="n" id="behPeek">—</div></div>
+        <div class="beh-card"><div class="ic">🚶</div><div class="lb">可疑地縮短距離</div><div class="n" id="behApproach">—</div></div>
+        <div class="beh-card"><div class="ic">🖐️</div><div class="lb">確認門把依然存在</div><div class="n" id="behTouch">—</div></div>
+        <div class="beh-card"><div class="ic">🧠</div><div class="lb">重新發明開門</div><div class="n" id="behResearch">—</div></div>
+        <div class="beh-card"><div class="ic">↩️</div><div class="lb">戰術性撤退</div><div class="n" id="behRetreat">—</div></div>
+        <div class="beh-card"><div class="ic">🐚</div><div class="lb">啟動離線模式</div><div class="n" id="behShell">—</div></div>
       </div>
       <p class="behavior-data-note" id="behaviorDataNote">依真實觀察紀錄中的行為文字計算。</p>
     </div>
 
-    <div class="section-label"><span class="num mono">02 · D</span><h2>🖐️ 門把娛樂指標</h2><div class="rule"></div></div>
+    <div class="section-label"><span class="num mono">02 · C</span><h2>📈 最近到底有沒有動</h2><div class="rule"></div></div>
+    <div class="card stage-trajectory-card" id="stageTrajectory" aria-live="polite" aria-busy="true">
+      <div class="stage-loading" aria-label="正在讀取階段軌跡"><span class="stage-loading-line wide"></span><span class="stage-loading-line"></span><span class="stage-loading-line mid"></span><span class="stage-loading-line"></span></div>
+    </div>
+
+    <div class="section-label"><span class="num mono">02 · D</span><h2>🖐️ 門把受害者報告</h2><div class="rule"></div></div>
     <details class="card entertainment-card">
-      <summary><span>查看此裝置的門把統計<span class="entertainment-local">娛樂內容 · 僅儲存在目前裝置</span></span></summary>
+      <summary><span>查看門把今日申訴<span class="entertainment-local">本報告僅儲存在目前裝置，門把拒絕跨裝置加班</span></span></summary>
       <div class="entertainment-body wear-card">
       <div class="wear-head">
         <h3>磨損程度</h3>
@@ -1655,6 +1658,27 @@
     return { type:'down', label:`回落 ${prevIdx - curIdx} 階` };
   }
 
+  function stageAbsurdVerdict(phaseKey, parts){
+    const level = parts.length ? Math.max(...parts.map(p=>p.idx)) : 0;
+    const pre = [
+      '龜龜已確認門的存在，並決定先尊重它的隱私。',
+      '龜龜正在靠近。所謂靠近，是一種需要長期研究的移動方式。',
+      '內部會議已同意可以前進，肢體執行部仍在閱讀會議紀錄。',
+      '開場白已在腦中完成數次彩排，目前沒有任何一句離開腦中。',
+      '距離送出只差最後一步，以及對最後一步的完整風險評估。',
+      '訊息真的出去了。觀測所正在確認這是否違反龜龜物理學。'
+    ];
+    const post = [
+      '重新接觸已發生，雙方暫時都假裝這是一件非常普通的事。',
+      '龜龜已經走回門口，目前正在研究「回來」能不能算完成一半。',
+      '互動正在形成。每一個自然回覆背後都有一場不自然的內部會議。',
+      '關係開始往前，但龜龜堅持使用肉眼幾乎看不見的速度。',
+      '連結逐漸穩定，觀測所暫時找不到新的理由可以替龜龜緊張。',
+      '關係已進入新階段。門把要求把這項成果寫進年終考核。'
+    ];
+    return (phaseKey==='post' ? post : pre)[Math.min(level,5)];
+  }
+
   // 02·A：目前觀測階段——只顯示「最新一筆有效 MIX 紀錄」的六階段資訊，不換算成看似精確的成功機率
   function renderStageOverview(){
     const container = document.getElementById('stageOverview');
@@ -1702,6 +1726,7 @@
     container.innerHTML = `
       ${switchHtml}
       <p class="stage-phase-note">${phase.label} · 最新觀測時間：${formatMixTime(latest.observed_at)}${legacy?' · 舊版單軸資料':''}</p>
+      <div class="stage-verdict">${stageAbsurdVerdict(selectedStagePhase,parts)}<small>觀測所翻譯結果，原始階段資料如下</small></div>
       <div class="stage-axis-grid">${axisCards}</div>
     `;
     bindStagePhaseButtons(container);
@@ -1742,9 +1767,14 @@
       <div class="stage-trend-summary" aria-label="最近 ${valid.length} 筆觀測變化摘要">
         <div class="stage-trend-stat"><span class="v">${valid.length}</span><span class="k">近期觀測</span></div>
         <div class="stage-trend-stat"><span class="v">${upCount}</span><span class="k">前進</span></div>
-        <div class="stage-trend-stat"><span class="v">${sameCount}</span><span class="k">維持</span></div>
-        <div class="stage-trend-stat"><span class="v">${downCount}</span><span class="k">回落</span></div>
+        <div class="stage-trend-stat"><span class="v">${sameCount}</span><span class="k">原地研究</span></div>
+        <div class="stage-trend-stat"><span class="v">${downCount}</span><span class="k">戰術性後退</span></div>
       </div>`;
+    const trendVerdict = upCount > downCount && upCount > sameCount
+      ? '系統判定：龜龜確實有動。觀測所對此感到措手不及。'
+      : sameCount >= upCount && sameCount >= downCount
+        ? `系統判定：龜龜成功把同一件事重新想了 ${sameCount || valid.length} 次。`
+        : '系統判定：這不是退步，是龜龜正在為前進增加助跑距離。';
     const listHtml = valid.map((e, i)=>{
       const parts = parseStageParts(e.stage).filter(p=>axesToCompare.includes(p.axis));
       return `
@@ -1754,7 +1784,7 @@
         </div>`;
     }).join('');
 
-    container.innerHTML = `<p class="stage-phase-note">${phase.label} · 僅摘要階段變化；完整內容請至 01 · C 查看。</p>` + summaryHtml + `<div class="stage-compact-list" aria-label="${phase.label}最近 ${valid.length} 筆階段摘要">${listHtml}</div>`;
+    container.innerHTML = `<p class="stage-phase-note">${phase.label} · 完整案情請至 01 · C 查看。</p>` + summaryHtml + `<p class="trajectory-verdict">${trendVerdict}</p><div class="stage-compact-list" aria-label="${phase.label}最近 ${valid.length} 筆階段摘要">${listHtml}</div>`;
   }
 
   const LOCATION_BY_STAGE = ['遠處觀望','靠近門口','門前','門把旁','手已放上門把','門後'];
