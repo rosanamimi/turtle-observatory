@@ -410,11 +410,11 @@
   .stage-empty-hint{margin:0;font-size:13px;line-height:1.6;}
 
   /* ---------- 02·B 階段軌跡 ---------- */
-  .stage-trajectory-card{padding:22px 20px 20px;min-height:220px;}
-  .stage-trend-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin:0 0 22px;background:rgba(255,255,255,.06);border:1px solid var(--line-soft);border-radius:10px;overflow:hidden;}
-  .stage-trend-stat{padding:11px 8px;text-align:center;background:rgba(8,7,18,.66);}
-  .stage-trend-stat .v{display:block;font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--ink);}
-  .stage-trend-stat .k{display:block;margin-top:2px;font-size:11px;color:var(--ink-soft);}
+  .stage-trajectory-card{padding:20px;min-height:180px;}
+  .stage-trend-summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 18px;}
+  .stage-trend-stat{display:inline-flex;align-items:baseline;gap:5px;padding:6px 10px;border:1px solid var(--line-soft);border-radius:100px;background:rgba(8,7,18,.42);}
+  .stage-trend-stat .v{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--ink);}
+  .stage-trend-stat .k{font-size:11px;color:var(--ink-soft);}
   .stage-mini-track{
     display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;
     padding:0 0 8px;margin-bottom:14px;
@@ -438,21 +438,13 @@
   .stage-tl-axes{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px;}
   .stage-axis-badge{display:inline-flex;align-items:center;padding:5px 10px;border:1px solid var(--line-soft);border-radius:100px;font-size:13px;color:var(--ink);background:rgba(183,178,222,.08);}
   .stage-axis-badge b{margin-right:5px;color:var(--wood);}
+  .stage-compact-list{border-top:1px solid var(--line-soft);}
+  .stage-compact-row{display:grid;grid-template-columns:132px minmax(0,1fr);align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid rgba(255,255,255,.05);}
+  .stage-compact-row:last-child{border-bottom:0;padding-bottom:2px;}
+  .stage-compact-time{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--ink-soft);white-space:nowrap;}
   .stage-tl-stage{font-family:'Noto Serif TC',serif;font-size:18px;font-weight:700;color:var(--ink);}
   .stage-trajectory-card .tl-time{font-size:15px;}
   .stage-trajectory-card .stage-change-tag{font-size:14px;}
-  .stage-trajectory-card .stage-tl-conclusion{
-    color:var(--ink-soft);font-size:16px;line-height:1.75;margin:10px 0 0;
-    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
-  }
-  .stage-tl-conclusion.is-expanded{-webkit-line-clamp:unset;overflow:visible;}
-  .stage-tl-toggle{
-    display:inline-block;margin-top:6px;background:transparent;border:none;padding:0;
-    font-family:'Space Mono',monospace;font-size:14px;color:var(--wood);cursor:pointer;
-  }
-  .stage-tl-toggle:hover{color:var(--wood-deep);text-decoration:underline;}
-  .stage-tl-toggle[hidden]{display:none;}
-
   .stage-loading{display:grid;gap:13px;padding:4px 0;}
   .stage-loading-line{height:14px;border-radius:6px;background:linear-gradient(90deg,rgba(183,178,222,.07),rgba(183,178,222,.15),rgba(183,178,222,.07));background-size:200% 100%;animation:stageShimmer 1.4s linear infinite;}
   .stage-loading-line.wide{width:68%;height:30px;}.stage-loading-line.mid{width:48%;}.stage-loading-line.short{width:32%;}
@@ -465,7 +457,7 @@
     .stage-change-tag{margin-left:50px;}
     .stage-mini-track{display:flex;overflow-x:auto;scroll-snap-type:x proximity;gap:0;padding-bottom:10px;overscroll-behavior-inline:contain;scrollbar-width:thin;}
     .stage-mini-item{flex:0 0 112px;scroll-snap-align:center;}
-    .stage-trend-summary{grid-template-columns:repeat(2,1fr);}
+    .stage-compact-row{grid-template-columns:1fr;gap:5px;padding:13px 2px;}
     .stage-hero-num{font-size:34px;}
     .stage-hero-name{font-size:19px;}
   }
@@ -1755,49 +1747,15 @@
       </div>`;
     const listHtml = valid.map((e, i)=>{
       const parts = parseStageParts(e.stage).filter(p=>axesToCompare.includes(p.axis));
-      const conclusion = e.conclusion ? escapeHtml(e.conclusion) : '';
-      const entryId = `stageTl${i}`;
       return `
-        <div class="tl-entry">
-          <div class="tl-time">${formatMixTime(e.observed_at)}</div>
+        <div class="stage-compact-row">
+          <time class="stage-compact-time">${formatMixTime(e.observed_at)}</time>
           <div class="stage-tl-axes">${parts.map(p=>`<span class="stage-axis-badge"><b>${p.axis}</b>${escapeHtml(p.label.replace(/^(心理|行動|互動|關係|P|A|F|R)\s*[:：]?\s*/i,''))}</span>`).join('')}</div>
-          ${conclusion ? `
-          <div class="tl-body">
-            <p class="stage-tl-conclusion" id="${entryId}">${conclusion}</p>
-            <button type="button" class="stage-tl-toggle" data-target="${entryId}" aria-controls="${entryId}" aria-expanded="false" hidden>展開全文</button>
-          </div>` : ''}
         </div>`;
     }).join('');
 
-    container.innerHTML = `<p class="stage-phase-note">${phase.label} · 最近 ${valid.length} 筆有效紀錄；變化僅在相同軸之間比較。</p>` + summaryHtml + `<div class="timeline" aria-label="${phase.label}最近 ${valid.length} 筆階段紀錄">${listHtml}</div>`;
-
-    container.querySelectorAll('.stage-tl-toggle').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const p = document.getElementById(btn.dataset.target);
-        if(!p) return;
-        const expanded = p.classList.toggle('is-expanded');
-        btn.textContent = expanded ? '收合' : '展開全文';
-        btn.setAttribute('aria-expanded', String(expanded));
-      });
-    });
-    syncStageTrajectoryToggles();
+    container.innerHTML = `<p class="stage-phase-note">${phase.label} · 僅摘要階段變化；完整內容請至 01 · C 查看。</p>` + summaryHtml + `<div class="stage-compact-list" aria-label="${phase.label}最近 ${valid.length} 筆階段摘要">${listHtml}</div>`;
   }
-
-  function syncStageTrajectoryToggles(){
-    document.querySelectorAll('#stageTrajectory .stage-tl-toggle').forEach(btn=>{
-      const p = document.getElementById(btn.dataset.target);
-      if(!p || !p.getClientRects().length) return; // 隱藏分頁等切換顯示後再量測
-      const expanded = p.classList.contains('is-expanded');
-      p.classList.remove('is-expanded');
-      const truncated = p.scrollHeight > p.clientHeight + 1;
-      p.classList.toggle('is-expanded', expanded && truncated);
-      btn.hidden = !truncated;
-      btn.textContent = expanded && truncated ? '收合' : '展開全文';
-      btn.setAttribute('aria-expanded', String(expanded && truncated));
-    });
-  }
-  window.addEventListener('resize', syncStageTrajectoryToggles);
-  if(document.fonts) document.fonts.ready.then(syncStageTrajectoryToggles);
 
   const LOCATION_BY_STAGE = ['遠處觀望','靠近門口','門前','門把旁','手已放上門把','門後'];
   const MIND_BASELINE_BY_STAGE = [20, 40, 60, 75, 90, 99];
@@ -2322,7 +2280,6 @@
     targetBtn.classList.add('active'); targetBtn.setAttribute('aria-selected','true');
     targetPanel.classList.add('active');
     if(tabName === 'log') scheduleMixMeasurement();
-    if(tabName === 'progress') syncStageTrajectoryToggles();
     if(scroll) window.scrollTo({top:0, behavior:'instant'});
     return true;
   }
