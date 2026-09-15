@@ -1565,14 +1565,17 @@
 
   function parseStageParts(stageStr){
     if(typeof stageStr !== 'string') return [];
-    return stageStr.split('｜').map(raw=>raw.trim()).filter(Boolean).map(raw=>{
-      const match = raw.match(/^(心理|行動|互動|關係|P|A|F|R)\s*[:：]?\s*([①②③④⑤⑥])/i);
+    return stageStr.split(/[｜；;]/).map(raw=>raw.trim()).filter(Boolean).map(raw=>{
+      const match = raw.match(/^(心理|行動|互動|關係|P|A|F|R)\s*[:：]?\s*([①②③④⑤⑥1-6])/i);
       if(match){
         const alias = match[1].toUpperCase();
-        return { axis:STAGE_AXIS_ALIAS[alias] || match[1], idx:STAGE_ORDER.indexOf(match[2]), label:raw };
+        const idx = /^[1-6]$/.test(match[2]) ? Number(match[2]) - 1 : STAGE_ORDER.indexOf(match[2]);
+        return { axis:STAGE_AXIS_ALIAS[alias] || match[1], idx, label:raw };
       }
-      const legacy = raw.match(/^([①②③④⑤⑥])/);
-      return legacy ? { axis:'舊版綜合', idx:STAGE_ORDER.indexOf(legacy[1]), label:raw } : null;
+      const legacy = raw.match(/^([①②③④⑤⑥1-6])/);
+      if(!legacy) return null;
+      const idx = /^[1-6]$/.test(legacy[1]) ? Number(legacy[1]) - 1 : STAGE_ORDER.indexOf(legacy[1]);
+      return { axis:'舊版綜合', idx, label:raw };
     }).filter(Boolean);
   }
   function stagePhaseOf(entry){
