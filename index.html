@@ -372,6 +372,7 @@
   .stage-verdict small{display:block;margin-top:6px;font:400 11.5px 'Space Mono',monospace;color:var(--ink-soft);}
   .trajectory-verdict{margin:2px 0 18px;font-family:'Noto Serif TC',serif;font-size:15px;line-height:1.7;color:var(--ink);}
   .stage-axis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  .stage-axis-grid.is-single{grid-template-columns:1fr;}
   .stage-axis-card{min-width:0;padding:16px;border:1px solid var(--line-soft);border-radius:12px;background:rgba(8,7,18,.36);}
   .stage-axis-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--wood);letter-spacing:.08em;}
   .stage-axis-value{margin-top:7px;font-family:'Noto Serif TC',serif;font-size:18px;font-weight:700;color:var(--ink);overflow-wrap:anywhere;}
@@ -1699,10 +1700,9 @@
     }
     const parts = parseStageParts(latest.stage);
     const legacy = parts.find(p=>p.axis==='舊版綜合');
-    const axes = legacy ? ['舊版綜合'] : phase.axes;
+    const axes = legacy ? ['舊版綜合'] : phase.axes.filter(axis=>parts.some(p=>p.axis===axis));
     const axisCards = axes.map(axis=>{
       const part = parts.find(p=>p.axis===axis);
-      if(!part) return `<div class="stage-axis-card"><div class="stage-axis-label">${axis}</div><div class="stage-axis-empty">本次未提供此軸資料</div></div>`;
       const previousPart = phaseEntries.slice(1).map(e=>parseStageParts(e.stage).find(p=>p.axis===axis)).find(Boolean);
       const change = stageChangeLabel(part.idx, previousPart ? previousPart.idx : null);
       return `<div class="stage-axis-card">
@@ -1718,7 +1718,7 @@
     container.innerHTML = `
       <p class="stage-phase-note">斷斷續續聊天中 · 最新觀測時間：${formatMixTime(latest.observed_at)}</p>
       <div class="stage-verdict">${stageAbsurdVerdict(selectedStagePhase,parts)}<small>觀測所翻譯結果，原始階段資料如下</small></div>
-      <div class="stage-axis-grid">${axisCards}</div>
+      <div class="stage-axis-grid${axes.length===1?' is-single':''}">${axisCards}</div>
     `;
   }
 
