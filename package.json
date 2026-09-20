@@ -1,0 +1,11 @@
+{
+  "name": "turtle-observatory",
+  "private": true,
+  "description": "雲養龜觀察所（靜態網站，無建置步驟；此 package.json 只為執行 tests/）",
+  "scripts": {
+    "test": "node tests/run.js"
+  },
+  "devDependencies": {
+    "jsdom": "^26.0.0"
+  }
+}
