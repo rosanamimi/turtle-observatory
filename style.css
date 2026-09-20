@@ -489,6 +489,17 @@ h1.title{
 .log-field{display:flex;flex-direction:column;gap:6px;}
 .log-number{width:120px;}
 .log-status{font-size:12px;color:var(--ink-soft);margin:2px 0 0;}
+.log-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 18px;}
+.log-filter{
+  flex:1 1 220px;min-width:0;
+  font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--ink);
+  background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:9px 12px;
+}
+.log-filter::placeholder{color:var(--ink-soft);opacity:0.85;}
+.log-filter:focus{outline:2px solid var(--wood);outline-offset:1px;}
+.log-count{font-size:12px;color:var(--ink-soft);}
+.log-more-row{display:flex;justify-content:center;padding:4px 0 18px;}
+.log-more-row [hidden]{display:none;}
 
 /* ---------- timeline ---------- */
 .timeline{position:relative;padding-left:22px;}

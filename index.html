@@ -50,7 +50,7 @@
     <div class="obs-quote-block">
       <div class="q-label">🔮 本日神諭 · 龜龜今日語錄</div>
       <blockquote id="quoteText">「我不是不推。」<br>「我只是還在研究。」</blockquote>
-      <div class="obs-quote-meta" id="quoteMeta">— 龜龜，今日第 17 次摸門把後</div>
+      <div class="obs-quote-meta" id="quoteMeta">— 龜龜</div>
 
       <div class="obs-quote-divider"></div>
 
@@ -200,7 +200,12 @@
 
     <div class="section-label log-scroll-target" id="logSecHistory"><span class="num mono">01 · B</span><h2>📋 龜龜觀察紀錄</h2><div class="rule"></div></div>
     <div class="card" style="padding:24px 24px 4px;">
+      <div class="log-tools">
+        <input type="search" id="logFilter" class="log-filter" placeholder="篩選已載入的紀錄（內容、事件、時間）" aria-label="篩選觀察紀錄" autocomplete="off">
+        <span class="log-count mono" id="logCount" aria-live="polite"></span>
+      </div>
       <div class="timeline" id="timeline"></div>
+      <div class="log-more-row"><button type="button" class="recent-log-more" id="logLoadMore" hidden>載入更多較早的紀錄</button></div>
     </div>
 
     <div class="section-label log-scroll-target" id="logSecMix">

@@ -46,7 +46,7 @@ const warnings = [
 ];
 
 let progress = 73;
-let touchCount = 17;
+let touchesTodayReal = null; // 今日「摸門把」次數，只由真實觀察紀錄計算；讀取失敗時為 null
 let wear = 81;
 const sceneCard = document.getElementById('sceneCard');
 const warnLogEntries = [];
@@ -206,14 +206,40 @@ async function requestWithTimeout(url, options, parse){
 }
 
 let logEntries = []; // 從資料庫讀回來的真實紀錄
+const LOG_PAGE_SIZE = 50;
+let logLimit = LOG_PAGE_SIZE; // 目前向資料庫要求的筆數上限，「載入更多」時遞增
+let logHasMore = false; // 上次讀取筆數達到上限，代表可能還有更舊的紀錄
+// 統計專用資料：今天的全部紀錄＋全部實際事件，獨立於時間軸分頁（「載入更多」不會改變統計）
+let statsEntries = [];
+const STATS_LIMIT = 1000;
+const LOG_CHUNK = 500; // 每次請求最多筆數，需小於 Supabase 單次回傳上限（預設 1000）
 let realRecordsLoaded = false;
 
-function renderTimeline(){
-  const all = logEntries;
-  document.getElementById('timeline').innerHTML = all.map(e => `
+// 時間軸單筆共用模板：time 與 bodyHtml 由呼叫端負責跳脫
+function tlEntryHtml(time, bodyHtml){
+  return `
     <div class="tl-entry">
-      <div class="tl-time mono">${escapeHtml(e.time)}</div>
-      <div class="tl-body">
+      <div class="tl-time mono">${escapeHtml(time)}</div>
+      <div class="tl-body">${bodyHtml}</div>
+    </div>
+  `;
+}
+
+// 觀察紀錄篩選（僅在已載入的資料內比對，不重新請求）
+let logFilter = '';
+function filteredLogEntries(){
+  const q = logFilter.trim().toLowerCase();
+  if(!q) return logEntries;
+  return logEntries.filter(e => [e.text, e.eventType, e.eventContent, e.time, e.eventTime].some(s => String(s ?? '').toLowerCase().includes(q)));
+}
+
+function renderTimeline(){
+  const list = filteredLogEntries();
+  const el = document.getElementById('timeline');
+  if(list.length === 0){
+    el.innerHTML = `<p class="recent-log-empty">${logEntries.length === 0 ? '尚無觀察紀錄。' : '沒有符合的紀錄。'}</p>`;
+  } else {
+    el.innerHTML = list.map(e => tlEntryHtml(e.time, `
         <p>${escapeHtml(e.text)}</p>
         ${e.progress ? `<div class="tl-progress">進度：${escapeHtml(e.progress)}</div>` : ''}
         ${e.hasEvent ? `
@@ -223,9 +249,14 @@ function renderTimeline(){
             ${e.eventContent ? `<p>${escapeHtml(e.eventContent)}</p>` : ''}
           </div>
         ` : ''}
-      </div>
-    </div>
-  `).join('');
+      `)).join('');
+  }
+  const moreBtn = document.getElementById('logLoadMore');
+  const countEl = document.getElementById('logCount');
+  if(moreBtn) moreBtn.hidden = !logHasMore;
+  if(countEl) countEl.textContent = logFilter.trim()
+    ? `符合 ${list.length} / 已載入 ${logEntries.length} 筆`
+    : `已載入 ${logEntries.length} 筆`;
 }
 
 // HOME 頁「RECENT SIGNAL／最近觀測」：合併真實觀察（observations）與 MIX 推測（mix_observations），
@@ -264,25 +295,15 @@ function renderRecentLog(){
       const stageText = e.stage ? escapeHtml(e.stage) : '';
       const conclusionText = e.conclusion ? escapeHtml(e.conclusion) : '';
       const body = [stageText, conclusionText].filter(Boolean).join('｜');
-      return `
-        <div class="tl-entry">
-          <div class="tl-time mono">${escapeHtml(e.time)}</div>
-          <div class="tl-body">
+      return tlEntryHtml(e.time, `
             <div class="recent-log-tag recent-log-tag-mix">🔮 MIX</div>
             <p>${body}</p>
-          </div>
-        </div>
-      `;
+          `);
     }
-    return `
-      <div class="tl-entry">
-        <div class="tl-time mono">${escapeHtml(e.time)}</div>
-        <div class="tl-body">
+    return tlEntryHtml(e.time, `
           <div class="recent-log-tag recent-log-tag-real">📌 真實觀察</div>
           <p>${escapeHtml(e.text)}</p>
-        </div>
-      </div>
-    `;
+        `);
   }).join('');
 }
 
@@ -489,7 +510,7 @@ function updateDashboardStats(){
   // 今日：以本地時區今天 00:00 至隔天 00:00 的完整時間戳比對（含年份，避免 9/2 誤中 9/20 或往年同日）
   const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
   const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate() + 1);
-  const todays = logEntries.filter(e => {
+  const todays = statsEntries.filter(e => {
     const t = new Date(e.createdAtRaw).getTime();
     return t >= dayStart.getTime() && t < dayEnd.getTime();
   });
@@ -524,8 +545,8 @@ function updateDashboardStats(){
   const shellToday = todays.filter(e => /縮/.test(e.text)).length;
   const prepToday = todays.filter(e => /準備訊息|想傳/.test(e.text)).length;
   // 「真正推門」「成功開門」是里程碑事件，看全部真實紀錄有沒有發生過，不侷限今天
-  const pushCount = logEntries.filter(e => e.hasEvent && /文字|訊息|簡訊|line|Line|LINE/i.test(e.eventType)).length;
-  const openCount = logEntries.filter(e => e.hasEvent && /通話|面對面|見面|語音|視訊/.test(e.eventType)).length;
+  const pushCount = statsEntries.filter(e => e.hasEvent && /文字|訊息|簡訊|line|Line|LINE/i.test(e.eventType)).length;
+  const openCount = statsEntries.filter(e => e.hasEvent && /通話|面對面|見面|語音|視訊/.test(e.eventType)).length;
 
   document.getElementById('behPeek').textContent = peekToday + ' 次';
   document.getElementById('behApproach').textContent = approachToday + ' 次';
@@ -540,6 +561,8 @@ function updateDashboardStats(){
   document.getElementById('behOpenCard').classList.toggle('zero', openCount === 0);
 
   document.getElementById('behTouch').textContent = touchesToday + ' 次';
+  touchesTodayReal = realRecordsLoaded ? touchesToday : null;
+  updateQuoteMeta();
   const behaviorNote = document.getElementById('behaviorDataNote');
   if(behaviorNote){
     const d = new Date();
@@ -557,19 +580,44 @@ function loadLogEntries(){
   return latestLogLoad;
 }
 
+// 依序分段抓取最新的 total 筆（每段 LOG_CHUNK），避免單次 limit 超過伺服器上限而被靜默截斷
+// 回傳 { rows, full }：full 表示湊滿了 total 筆（可能還有更舊的紀錄）
+async function fetchObservationWindow(total, parseJson){
+  const rows = [];
+  while(rows.length < total){
+    const n = Math.min(LOG_CHUNK, total - rows.length);
+    const page = await requestWithTimeout(
+      `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=created_at,text,progress,has_event,event_time,event_type,event_content&order=created_at.desc&limit=${n}&offset=${rows.length}`,
+      { headers: SUPABASE_HEADERS },
+      parseJson
+    );
+    rows.push(...page);
+    if(page.length < n) return { rows, full: false };
+  }
+  return { rows, full: true };
+}
+
+// 今天（本地時區 00:00～隔天 00:00）的全部紀錄，加上所有實際事件
+function statsQueryUrl(){
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const end = new Date(start); end.setDate(end.getDate() + 1);
+  const cond = `(has_event.eq.true,and(created_at.gte.${start.toISOString()},created_at.lt.${end.toISOString()}))`;
+  return `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=created_at,text,has_event,event_type&or=${encodeURIComponent(cond)}&order=created_at.desc&limit=${STATS_LIMIT}`;
+}
+
 async function runLogLoad(seq){
   const statusEl = document.getElementById('logStatus');
   statusEl.textContent = '正在連接資料庫…';
   let loaded = false;
   try{
-    const rows = await requestWithTimeout(
-      `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=created_at,text,progress,has_event,event_time,event_type,event_content&order=created_at.desc&limit=50`,
-      { headers: SUPABASE_HEADERS },
-      async res => {
-        if(!res.ok) throw new Error('load failed: ' + res.status);
-        return res.json();
-      }
-    );
+    const parseJson = async res => {
+      if(!res.ok) throw new Error('load failed: ' + res.status);
+      return res.json();
+    };
+    // 統計查詢失敗不視為整體失敗：退回用已載入的紀錄計算
+    const statsReq = requestWithTimeout(statsQueryUrl(), { headers: SUPABASE_HEADERS }, parseJson).catch(() => null);
+    const { rows, full } = await fetchObservationWindow(logLimit, parseJson);
+    const statRows = await statsReq;
     if(seq !== logLoadSeq) return latestLogLoad;
     logEntries = rows.map(row => ({
       time: formatTimestamp(row.created_at),
@@ -581,19 +629,29 @@ async function runLogLoad(seq){
       eventType: row.event_type || '',
       eventContent: row.event_content || ''
     }));
-    statusEl.textContent = `已連接資料庫，共 ${logEntries.length} 筆真實紀錄（所有裝置共用）。`;
+    statsEntries = statRows
+      ? statRows.map(r => ({ createdAtRaw: r.created_at, text: r.text || '', hasEvent: !!r.has_event, eventType: r.event_type || '' }))
+      : logEntries;
+    logHasMore = full;
+    statusEl.textContent = logHasMore
+      ? `已連接資料庫，已載入最近 ${logEntries.length} 筆真實紀錄，可能還有更早的紀錄。`
+      : `已連接資料庫，共 ${logEntries.length} 筆真實紀錄（所有裝置共用）。`;
     loaded = true;
     realRecordsLoaded = true;
   }catch(err){
     if(seq !== logLoadSeq) return latestLogLoad;
     logEntries = [];
+    logHasMore = false;
+    statsEntries = [];
     realRecordsLoaded = false;
-    statusEl.textContent = '資料庫連線失敗，暫時只顯示範例資料。請確認網路連線，或稍後重新整理再試。';
+    statusEl.textContent = '資料庫連線失敗，目前無法顯示紀錄。請確認網路連線，或稍後重新整理再試。';
   }
   renderTimeline();
   renderRecentLog();
   updateDashboardStats();
   if(!loaded){
+    touchesTodayReal = null;
+    updateQuoteMeta();
     document.querySelectorAll('#tab-progress .behavior-primary .n,#tab-progress .behavior-secondary .n').forEach(el=>el.textContent='—');
     document.getElementById('behaviorDataNote').textContent = '真實觀察資料暫時無法讀取，統計尚未更新。';
   }
@@ -664,6 +722,15 @@ document.querySelectorAll('input[name="hasEvent"]').forEach(radio => {
 });
 
 document.getElementById('addLogBtn').addEventListener('click', addLogEntry);
+
+document.getElementById('logFilter').addEventListener('input', e => {
+  logFilter = e.target.value;
+  renderTimeline();
+});
+document.getElementById('logLoadMore').addEventListener('click', () => {
+  logLimit += LOG_PAGE_SIZE;
+  loadLogEntries();
+});
 loadLogEntries();
 
 // ---------- MIX 龜龜觀測站（獨立的 Supabase 資料表：mix_observations，server-side 分頁） ----------
@@ -1085,10 +1152,16 @@ function setToast(msg){
   t.classList.add('show');
 }
 
+function updateQuoteMeta(){
+  const el = document.getElementById('quoteMeta');
+  if(!el) return;
+  el.textContent = touchesTodayReal === null ? '— 龜龜' : `— 龜龜，今日第 ${touchesTodayReal} 次摸門把後`;
+}
+
 function randomQuote(){
   const q = quotes[Math.floor(Math.random()*quotes.length)];
   document.getElementById('quoteText').innerHTML = q[1] ? `${q[0]}<br>${q[1]}` : q[0];
-  document.getElementById('quoteMeta').textContent = `— 龜龜，今日第 ${touchCount} 次摸門把後`;
+  updateQuoteMeta();
 }
 
 function nowStamp(){
@@ -1159,7 +1232,6 @@ document.getElementById('checkBtn').addEventListener('click', ()=>{
   }
   setProgress(progress + delta, dir);
 
-  touchCount += Math.random() < 0.6 ? 1 : 0;
 
   handleCheckCount += 1;
   setWear(wear + (Math.random()<0.5?1:0));
