@@ -16,6 +16,8 @@
 │   ├── hero-turtle.webp    # 首頁龜龜圖片
 │   └── bg-observatory.jpg  # 背景
 ├── push.bat            # 一鍵 pull / commit / push（Windows）
+├── tests/              # 自動化測試（jsdom，只在開發時使用）
+├── package.json        # 僅用於執行測試，網站本身不需要建置
 └── README.md
 ```
 
@@ -23,7 +25,7 @@
 
 - 首頁：門前觀測場景、本日神諭與互動按鈕、最近觀測（合併觀察紀錄與 MIX）
 - 階段與進度：目前階段與階段軌跡、今日行為統計、門把磨損（僅存本機）
-- 觀察紀錄：真實觀察紀錄新增／時間軸，串接 [Supabase](https://supabase.com) 資料庫（`observations` 表）
+- 觀察紀錄：真實觀察紀錄新增／時間軸（可篩選、可載入更多較早的紀錄），串接 [Supabase](https://supabase.com) 資料庫（`observations` 表）
 - 系統警告：隨機警告訊號 + 歷史紀錄
 
 ## 資料庫（Supabase）
@@ -62,6 +64,17 @@
 ## 本機開發
 
 直接用瀏覽器打開 `index.html` 即可，不需要建置工具（`style.css`、`app.js` 以相對路徑載入）。
+
+## 測試
+
+網站本身不需要建置，但有一組用 [jsdom](https://github.com/jsdom/jsdom) 跑的自動化測試（需 Node.js）：
+
+```
+npm install
+npm test
+```
+
+測試涵蓋 XSS 跳脫、分頁與 modal 的鍵盤操作、警告計時器、請求逾時與競態、今日統計與統計查詢（含失敗退回）、載入更多（含伺服器單次筆數上限）與篩選。不會連線到真實資料庫。
 
 ## 部署
 
