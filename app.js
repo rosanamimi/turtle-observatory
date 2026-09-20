@@ -291,10 +291,6 @@ function formatTimestamp(iso){
   return `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
 }
 
-function todayLabel(){
-  const d = new Date();
-  return `${d.getMonth()+1}/${d.getDate()}`;
-}
 
 // 四軸階段：心理／行動屬於重新接觸前，互動／關係屬於重新接觸後。
 // 單一圈號格式保留為舊版綜合階段，不改寫既有資料。
@@ -490,8 +486,13 @@ const TOUCH_KEYWORDS = /摸門把|研究門把|確認門把|看門|靠近|找理
 
 // 完全從真實觀察紀錄（observations）＋ MIX 推測（mix_observations）自動推算 Dashboard 數字
 function updateDashboardStats(){
-  const today = todayLabel();
-  const todays = logEntries.filter(e => e.time.startsWith(today));
+  // 今日：以本地時區今天 00:00 至隔天 00:00 的完整時間戳比對（含年份，避免 9/2 誤中 9/20 或往年同日）
+  const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate() + 1);
+  const todays = logEntries.filter(e => {
+    const t = new Date(e.createdAtRaw).getTime();
+    return t >= dayStart.getTime() && t < dayEnd.getTime();
+  });
 
   // 今日研究門把：文字命中任一關鍵字就算一次
   const touchesToday = todays.filter(e => TOUCH_KEYWORDS.test(e.text)).length;
@@ -1159,7 +1160,6 @@ document.getElementById('checkBtn').addEventListener('click', ()=>{
   setProgress(progress + delta, dir);
 
   touchCount += Math.random() < 0.6 ? 1 : 0;
-  document.getElementById('behTouch').textContent = touchCount + ' 次';
 
   handleCheckCount += 1;
   setWear(wear + (Math.random()<0.5?1:0));
