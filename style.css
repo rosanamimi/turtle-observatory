@@ -956,3 +956,28 @@ footer{margin-top:60px;text-align:center;}
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
 }
+
+
+/* RL 戀愛選擇軌：三軌總覽與各軌獨立趨勢 */
+.rl-overview-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.rl-overview-item{min-width:0;padding:16px;border:1px solid rgba(174,151,224,.24);border-radius:16px;background:rgba(23,21,55,.24);overflow-wrap:anywhere}
+.rl-overview-title{font-size:12px;letter-spacing:.04em;opacity:.82}
+.rl-overview-value{font-size:30px;font-weight:800;line-height:1.35;margin:8px 0}
+.rl-overview-description{font-size:13px;line-height:1.7;min-height:42px}
+.rl-overview-item small{display:block;margin-top:12px;opacity:.65;font-size:11px;line-height:1.6}
+.rl-track-dots{display:flex;gap:5px;margin:13px 0 0}
+.rl-track-dots span{flex:1;height:7px;border-radius:5px;background:rgba(170,161,207,.23);font-size:0}
+.rl-track-dots span.is-filled{background:#aa8ce5}
+.rl-axis-rl .rl-track-dots span.is-filled{background:#e7b8d9}
+.rl-axis-f .rl-track-dots span.is-filled{background:#8cc9c0}
+.rl-track-detail{display:flex;flex-direction:column;gap:5px;margin-top:10px;font-size:11px;line-height:1.7;opacity:.82;overflow-wrap:anywhere}
+.rl-track-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px}
+.rl-track-tabs button{border:1px solid rgba(173,153,218,.3);border-radius:100px;background:transparent;color:inherit;padding:8px 13px;font:inherit;font-size:12px;cursor:pointer}
+.rl-track-tabs button.is-active{background:rgba(178,141,226,.2);border-color:#bca2ed}
+.rl-timeline{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.rl-timeline-row{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;padding:12px;border:1px solid rgba(170,161,207,.18);border-radius:12px;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.rl-timeline-row time{font-size:12px;opacity:.72;white-space:nowrap}
+.rl-timeline-level{display:inline-block;margin-right:6px}
+.rl-disclaimer{font-size:11px;line-height:1.7;opacity:.68;margin-top:15px}
+.mix-stage-rl{border-color:rgba(237,174,220,.5);background:rgba(219,149,207,.15)}
+@media(max-width:720px){.rl-overview-grid{grid-template-columns:1fr}.rl-overview-description{min-height:0}.rl-timeline-row{grid-template-columns:1fr;gap:4px}.rl-track-tabs button{flex:1;min-width:calc(50% - 8px)}}
