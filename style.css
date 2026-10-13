@@ -981,3 +981,7 @@ footer{margin-top:60px;text-align:center;}
 .rl-disclaimer{font-size:11px;line-height:1.7;opacity:.68;margin-top:15px}
 .mix-stage-rl{border-color:rgba(237,174,220,.5);background:rgba(219,149,207,.15)}
 @media(max-width:720px){.rl-overview-grid{grid-template-columns:1fr}.rl-overview-description{min-height:0}.rl-timeline-row{grid-template-columns:1fr;gap:4px}.rl-track-tabs button{flex:1;min-width:calc(50% - 8px)}}
+
+.mix-rl-detail{width:100%;flex-basis:100%;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.mix-rl-detail summary{cursor:pointer;opacity:.8;padding:5px 0}
+.mix-rl-detail p{white-space:pre-line;margin:7px 0 0;padding:10px 12px;border-radius:9px;background:rgba(171,139,214,.1)}
