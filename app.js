@@ -292,7 +292,7 @@ function renderRecentLog(){
 
   el.innerHTML = merged.map(e => {
     if(e.kind === 'mix'){
-      const stageText = e.stage ? escapeHtml(e.stage) : '';
+      const stageText = e.stage ? escapeHtml(String(e.stage).split('｜').filter(x=>!/^RL/i.test(x.trim())).slice(0,2).join('｜')) : '';
       const conclusionText = e.conclusion ? escapeHtml(e.conclusion) : '';
       const body = [stageText, conclusionText].filter(Boolean).join('｜');
       return tlEntryHtml(e.time, `
@@ -806,13 +806,23 @@ function escapeHtml(s){
 }
 
 function renderMixStageBadges(stage){
-  return String(stage ?? '').split('｜').map(s => s.trim()).filter(Boolean).map(label => {
-    // 英文字母需位於開頭，後接數字、圈號、分隔符或結尾，避免誤認一般舊文字。
-    const axis = label.match(/^(心理|行動|互動|關係)/)?.[1]
-      || label.match(/^([PAFR])(?=\s|[0-9①-⑳０-９:：｜·-]|$)/i)?.[1]?.toUpperCase();
-    const tone = /^RL(?:[1-5]|\s*N\/A)/i.test(label) ? 'rl' : ({心理:'p', P:'p', 行動:'a', A:'a', 互動:'f', F:'f', 關係:'r', R:'r'})[axis] || 'a';
-    return `<span class="mix-stage-badge mix-stage-${tone}">${escapeHtml(label)}</span>`;
-  }).join('');
+  const segments=String(stage??'').split('｜').map(s=>s.trim()).filter(Boolean);
+  const result=[];const details=[];
+  for(const label of segments){
+    const rl=/^RL(?:[1-5]|\s*N\/A)/i.test(label);
+    const axis=rl?'RL':label.match(/^(心理|行動|互動|關係)/)?.[1]
+      ||label.match(/^([PAFR])(?=\s|[0-9①-⑳０-９:：｜·-]|$)/i)?.[1]?.toUpperCase();
+    const tone=({RL:'rl',心理:'p',P:'p',行動:'a',A:'a',互動:'f',F:'f',關係:'r',R:'r'})[axis]||'a';
+    if(rl){
+      const short=label.replace(/〔[\s\S]*〕/,'').trim();
+      const explanation=label.match(/〔([\s\S]*)〕/);
+      result.push('<span class="mix-stage-badge mix-stage-rl">'+escapeHtml(short)+'</span>');
+      if(explanation)details.push('<details class="mix-rl-detail"><summary>查看 RL 判定依據</summary><p>'+escapeHtml(explanation[1].replaceAll('；','\n'))+'</p></details>');
+    }else{
+      result.push('<span class="mix-stage-badge mix-stage-'+tone+'">'+escapeHtml(label)+'</span>');
+    }
+  }
+  return result.join('')+details.join('');
 }
 
 function mixReadingBlock(value, kind, index){
