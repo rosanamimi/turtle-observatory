@@ -410,94 +410,142 @@ function stageAbsurdVerdict(phaseKey, parts){
 }
 
 // 02·A：目前觀測階段——只顯示「最新一筆有效 MIX 紀錄」的六階段資訊，不換算成看似精確的成功機率
-function renderStageOverview(){
-  const container = document.getElementById('stageOverview');
-  if(!container) return;
-  container.setAttribute('aria-busy','false');
-  const valid = validMixEntries();
-  if(valid.length === 0){
-    container.innerHTML = `
-      <div class="stage-empty">
-        <p class="stage-empty-title">尚無可用的 MIX 觀測資料</p>
-        <p class="stage-empty-hint">目前尚無含有效階段的 MIX 觀測紀錄，有紀錄後這裡才會顯示龜龜目前的六階段觀測位置。</p>
-      </div>`;
-    return;
+// 三軌同欄解析：R1-R5、RL1-RL5、F1-F7；保留既有 stage 字串與舊資料。
+const RL_START = Date.parse('2026-10-08T16:00:00Z'); // 台灣 2026/10/09 00:00
+const TRACK_META = {
+  R:{label:'R · 關係定位',name:'整體關係',max:5},
+  RL:{label:'RL · 戀愛選擇',name:'戀愛選擇',max:5},
+  F:{label:'F · 實際互動',name:'實際互動',max:7},
+  pre:{label:'接觸前 · 歷史',name:'接觸前',max:6}
+};
+let selectedTrajectoryTrack='RL';
+let trackHistoryEntries=[];
+let trackHistoryLoaded=false;
+function parseTrack(stage,axis){
+  const raw=String(stage??'');
+  const segments=raw.split('｜').map(s=>s.trim());
+  const re=axis==='RL'?/^RL([1-5])(?=\s|$)/i:axis==='R'?/^R([1-5])(?=\s|$)/i:/^F([1-7])(?=\s|$)/i;
+  for(const part of segments){
+    const m=part.match(re);
+    if(m)return {level:Number(m[1]),label:part,axis};
+    if(axis==='RL'&&/^RL\s*N\/A\b/i.test(part))return {level:null,label:part,axis};
   }
-  const phaseEntries = valid.filter(e=>stagePhaseOf(e)===selectedStagePhase);
-  const latest = phaseEntries[0];
-  const phase = STAGE_AXES[selectedStagePhase];
-  if(!latest){
-    container.innerHTML = `<div class="stage-empty"><p class="stage-empty-title">尚無聊天後的互動／關係階段資料</p><p class="stage-empty-hint">完整的接觸前紀錄仍可在 01 · C MIX 龜龜觀測站查看。</p></div>`;
-    return;
-  }
-  const parts = parseStageParts(latest.stage);
-  const legacy = parts.find(p=>p.axis==='舊版綜合');
-  const axes = legacy ? ['舊版綜合'] : phase.axes.filter(axis=>parts.some(p=>p.axis===axis));
-  const axisCards = axes.map(axis=>{
-    const part = parts.find(p=>p.axis===axis);
-    const previousPart = phaseEntries.slice(1).map(e=>parseStageParts(e.stage).find(p=>p.axis===axis)).find(Boolean);
-    const change = stageChangeLabel(part.idx, previousPart ? previousPart.idx : null);
-    return `<div class="stage-axis-card">
-      <div class="stage-axis-label">${axis}</div>
-      <div class="stage-axis-value">${escapeHtml(part.label.replace(/^(心理|行動|互動|關係|P|A|F|R)\s*[:：]?\s*/i,''))}</div>
-      <span class="stage-change-tag stage-change-${change.type}">${change.label}</span>
-      <div class="stage-progress" role="img" aria-label="${axis}為第 ${part.idx+1} 階">
-        <div class="stage-progress-rail"><div class="stage-progress-fill" style="width:${((part.idx+1)/6)*100}%"></div></div>
-        <div class="stage-progress-dots">${STAGE_ORDER.map((n,i)=>`<span class="stage-progress-dot${i<=part.idx?' is-reached':''}${i===part.idx?' is-current':''}">${n}</span>`).join('')}</div>
-      </div>
-    </div>`;
-  }).join('');
-  container.innerHTML = `
-    <p class="stage-phase-note">斷斷續續聊天中 · 最新觀測時間：${formatMixTime(latest.observed_at)}</p>
-    <div class="stage-verdict">${stageAbsurdVerdict(selectedStagePhase,parts)}<small>觀測所翻譯結果，原始階段資料如下</small></div>
-    <div class="stage-axis-grid${axes.length===1?' is-single':''}">${axisCards}</div>
-  `;
-}
-
-// 02·B：階段軌跡——最近 10 筆有效 MIX 紀錄，由新到舊排列，保留連續重複階段（不去重）
-function renderStageTrajectory(){
-  const container = document.getElementById('stageTrajectory');
-  if(!container) return;
-  container.setAttribute('aria-busy','false');
-  const allValid = validMixEntries(); // 新→舊
-  const valid = allValid.filter(e=>stagePhaseOf(e)===selectedStagePhase);
-  if(valid.length === 0){
-    container.innerHTML = `<p class="stage-tl-empty">尚無可用的 MIX 觀測資料，暫無階段軌跡可顯示。</p>`;
-    return;
-  }
-  const phase = STAGE_AXES[selectedStagePhase];
-  let upCount = 0, sameCount = 0, downCount = 0;
-  const axesToCompare = selectedStagePhase==='pre' ? ['心理','行動','舊版綜合'] : phase.axes;
-  axesToCompare.forEach(axis=>{
-    const values = valid.map(e=>parseStageParts(e.stage).find(p=>p.axis===axis)).filter(Boolean);
-    for(let i=0;i<values.length-1;i++){
-      if(values[i].idx > values[i+1].idx) upCount++;
-      else if(values[i].idx < values[i+1].idx) downCount++;
-      else sameCount++;
+  // 舊版格式：僅供原 R/F 歷史顯示，絕不轉換成 RL。
+  if(axis==='R'||axis==='F'){
+    const word=axis==='R'?'關係':'互動';
+    for(const part of segments){
+      const m=part.match(new RegExp('^'+word+'\\s*[:：]?\\s*([①②③④⑤⑥⑦1-7])'));
+      if(m){
+        const circles='①②③④⑤⑥⑦';
+        const level=/^[1-7]$/.test(m[1])?Number(m[1]):circles.indexOf(m[1])+1;
+        if(level>=1&&level<=TRACK_META[axis].max)return {level,label:part,axis};
+      }
     }
-  });
-  const summaryHtml = `
-    <div class="stage-trend-summary" aria-label="最近 ${valid.length} 筆觀測變化摘要">
-      <div class="stage-trend-stat"><span class="v">${valid.length}</span><span class="k">近期觀測</span></div>
-      <div class="stage-trend-stat"><span class="v">${upCount}</span><span class="k">前進</span></div>
-      <div class="stage-trend-stat"><span class="v">${sameCount}</span><span class="k">原地研究</span></div>
-      <div class="stage-trend-stat"><span class="v">${downCount}</span><span class="k">戰術性後退</span></div>
-    </div>`;
-  const trendVerdict = upCount > downCount && upCount > sameCount
-    ? '系統判定：龜龜確實有動。觀測所對此感到措手不及。'
-    : sameCount >= upCount && sameCount >= downCount
-      ? `系統判定：龜龜成功把同一件事重新想了 ${sameCount || valid.length} 次。`
-      : '系統判定：這不是退步，是龜龜正在為前進增加助跑距離。';
-  const listHtml = valid.map((e, i)=>{
-    const parts = parseStageParts(e.stage).filter(p=>axesToCompare.includes(p.axis));
-    return `
-      <div class="stage-compact-row">
-        <time class="stage-compact-time">${formatMixTime(e.observed_at)}</time>
-        <div class="stage-tl-axes">${parts.map(p=>`<span class="stage-axis-badge"><b>${p.axis}</b>${escapeHtml(p.label.replace(/^(心理|行動|互動|關係|P|A|F|R)\s*[:：]?\s*/i,''))}</span>`).join('')}</div>
-      </div>`;
+  }
+  return null;
+}
+function trackEntries(axis){
+  const rows=trackHistoryLoaded?trackHistoryEntries:mixLatestEntries;
+  return rows.filter(e=>axis==='RL'?Date.parse(e.observed_at)>=RL_START:true)
+    .map(e=>({...e,track:parseTrack(e.stage,axis)}))
+    .filter(e=>e.track);
+}
+function trackDetail(part){
+  const match=part.label.match(/〔(.+)〕/);
+  if(!match)return '';
+  return match[1].split('；').map(s=>'<span>'+escapeHtml(s)+'</span>').join('');
+}
+function trackDots(level,max){
+  return '<div class="rl-track-dots" aria-label="第 '+level+' 階，共 '+max+' 階">'+Array.from({length:max},(_,i)=>
+    '<span class="'+(i+1<=level?'is-filled ':'')+(i+1===level?'is-current':'')+'">'+(i+1)+'</span>').join('')+'</div>';
+}
+function renderStageOverview(){
+  const root=document.getElementById('stageOverview');
+  if(!root)return;
+  root.setAttribute('aria-busy','false');
+  const cards=['R','RL','F'].map(axis=>{
+    const rows=trackEntries(axis);
+    const valid=rows.find(e=>e.track.level!==null);
+    const latest=rows[0];
+    const entry=axis==='RL'?latest:valid;
+    const part=entry?.track;
+    const level=part?.level;
+    const note=axis==='RL'?'自 2026/10/09 正式追蹤':axis==='F'?'僅記錄已發生的互動':'保留歷史關係定位';
+    return '<section class="rl-overview-item rl-axis-'+axis.toLowerCase()+'">'+
+      '<div class="rl-overview-title">'+TRACK_META[axis].label+'</div>'+
+      '<div class="rl-overview-value">'+(part?(level===null?'N/A':axis+level):'—')+'</div>'+
+      '<p class="rl-overview-description">'+(part?escapeHtml(part.label.replace(/^((?:RL|R|F)\s*(?:[1-7]|N\/A))\s*/i,'')):'尚無適用紀錄')+'</p>'+
+      (level!==null&&level!==undefined?trackDots(level,TRACK_META[axis].max):'')+
+      '<small>'+escapeHtml(entry?formatMixTime(entry.observed_at)+' · '+note:note)+'</small>'+
+      (part&&axis==='RL'?'<div class="rl-track-detail">'+trackDetail(part)+'</div>':'')+
+      '</section>';
   }).join('');
-
-  container.innerHTML = `<p class="stage-phase-note">${phase.label} · 完整案情請至 01 · C 查看。</p>` + summaryHtml + `<p class="trajectory-verdict">${trendVerdict}</p><div class="stage-compact-list" aria-label="${phase.label}最近 ${valid.length} 筆階段摘要">${listHtml}</div>`;
+  root.innerHTML='<p class="stage-phase-note">三軌獨立判定 · 每軌取自身最新適用觀測，不以 R 換算 RL</p>'+
+    '<div class="rl-overview-grid">'+cards+'</div>'+
+    '<p class="rl-disclaimer">占盤分類屬象徵性觀測，非對當事人心理的現實確認；RL5 需實際言語或行動證據。</p>';
+}
+function renderStageTrajectory(){
+  const root=document.getElementById('stageTrajectory');
+  if(!root)return;
+  root.setAttribute('aria-busy','false');
+  const nav='<div class="rl-track-tabs" role="group" aria-label="選擇觀測軌道">'+
+    Object.entries(TRACK_META).map(([key,meta])=>'<button type="button" data-trajectory-track="'+key+'" class="'+(key===selectedTrajectoryTrack?'is-active':'')+'" aria-pressed="'+(key===selectedTrajectoryTrack)+'">'+meta.label+'</button>').join('')+'</div>';
+  const axis=selectedTrajectoryTrack;
+  if(axis==='pre'){
+    const rows=(trackHistoryLoaded?trackHistoryEntries:mixLatestEntries).filter(e=>parseStageParts(e.stage).some(p=>p.axis==='心理'||p.axis==='行動'||p.axis==='舊版綜合')).slice(0,30);
+    root.innerHTML=nav+'<p class="stage-phase-note">重新接觸前的原始心理／行動階段，完整保留，不轉換為 RL。</p>'+
+      (rows.length?'<div class="rl-timeline">'+rows.map(e=>'<div class="rl-timeline-row"><time>'+escapeHtml(formatMixTime(e.observed_at))+'</time><div>'+escapeHtml(e.stage)+'</div></div>').join('')+'</div>':'<p>尚無接觸前歷史紀錄。</p>');
+    return;
+  }
+  const rows=trackEntries(axis);
+  const valid=rows.filter(e=>e.track.level!==null);
+  let up=0,down=0,same=0;
+  for(let i=0;i<valid.length-1;i++){
+    if(valid[i].track.level>valid[i+1].track.level)up++;
+    else if(valid[i].track.level<valid[i+1].track.level)down++;
+    else same++;
+  }
+  const stats='<div class="stage-trend-summary"><div class="stage-trend-stat"><span class="v">'+valid.length+'</span><span class="k">有效階段</span></div>'+
+    '<div class="stage-trend-stat"><span class="v">'+up+'</span><span class="k">上升</span></div>'+
+    '<div class="stage-trend-stat"><span class="v">'+same+'</span><span class="k">持平</span></div>'+
+    '<div class="stage-trend-stat"><span class="v">'+down+'</span><span class="k">下降</span></div></div>';
+  const list=rows.slice(0,30).map(e=>{
+    const p=e.track;const level=p.level;
+    return '<div class="rl-timeline-row"><time>'+escapeHtml(formatMixTime(e.observed_at))+'</time>'+
+      '<div><strong class="rl-timeline-level">'+(level===null?'N/A':axis+level)+'</strong> '+escapeHtml(p.label.replace(/^((?:RL|R|F)\s*(?:[1-7]|N\/A))\s*/i,''))+
+      (axis==='RL'?'<div class="rl-track-detail">'+trackDetail(p)+'</div>':'')+'</div></div>';
+  }).join('');
+  root.innerHTML=nav+'<p class="stage-phase-note">'+TRACK_META[axis].label+
+    (axis==='RL'?' · 2026/10/09 起 · N/A 不計入升降':' · 各次觀測獨立判定')+'</p>'+
+    stats+(rows.length?'<div class="rl-timeline">'+list+'</div>':'<p class="stage-tl-empty">尚無適用觀測資料。</p>')+
+    '<p class="rl-disclaimer">相近時間重複起盤不視為獨立驗證；階段變化不等於已證實的現實心理變化。</p>';
+}
+document.getElementById('stageTrajectory')?.addEventListener('click',event=>{
+  const btn=event.target.closest('[data-trajectory-track]');
+  if(!btn)return;
+  selectedTrajectoryTrack=btn.dataset.trajectoryTrack;
+  renderStageTrajectory();
+});
+async function loadTrackHistory(){
+  const all=[];const chunk=500;
+  try{
+    for(let offset=0;offset<10000;offset+=chunk){
+      const data=await requestWithTimeout(
+        SUPABASE_URL+'/rest/v1/'+MIX_TABLE+'?select=id,observed_at,stage,question,conclusion&order=observed_at.desc&limit='+chunk+'&offset='+offset,
+        {headers:SUPABASE_HEADERS},
+        async res=>{if(!res.ok)throw new Error('history failed: '+res.status);return res.json();}
+      );
+      all.push(...data);
+      if(data.length<chunk)break;
+    }
+    trackHistoryEntries=all;
+    trackHistoryLoaded=true;
+    renderStageOverview();renderStageTrajectory();
+  }catch(error){
+    console.warn('Track history unavailable; using latest page only.',error);
+    trackHistoryLoaded=false;
+    renderStageOverview();renderStageTrajectory();
+  }
 }
 
 const MIND_BASELINE_BY_STAGE = [20, 40, 60, 75, 90, 99];
@@ -762,7 +810,7 @@ function renderMixStageBadges(stage){
     // 英文字母需位於開頭，後接數字、圈號、分隔符或結尾，避免誤認一般舊文字。
     const axis = label.match(/^(心理|行動|互動|關係)/)?.[1]
       || label.match(/^([PAFR])(?=\s|[0-9①-⑳０-９:：｜·-]|$)/i)?.[1]?.toUpperCase();
-    const tone = ({心理:'p', P:'p', 行動:'a', A:'a', 互動:'f', F:'f', 關係:'r', R:'r'})[axis] || 'a';
+    const tone = /^RL(?:[1-5]|\s*N\/A)/i.test(label) ? 'rl' : ({心理:'p', P:'p', 行動:'a', A:'a', 互動:'f', F:'f', 關係:'r', R:'r'})[axis] || 'a';
     return `<span class="mix-stage-badge mix-stage-${tone}">${escapeHtml(label)}</span>`;
   }).join('');
 }
@@ -938,6 +986,7 @@ async function runMixPage(page, opts){
     }
     renderStageOverview();
     renderStageTrajectory();
+    if(page===1) loadTrackHistory();
     markProgressUpdated();
     if(opts && opts.scrollToSection){
       const target = document.getElementById('logSecMix');
